@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rótulos Rota e Veleiros do Caribe</title>
+<style>
+  :root { --fundo:#f3f1ec; --cartao:#fff; --texto:#1c1f22; --suave:#6b7075; --linha:#dcd8cf; --destaque:#1f5f5b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--fundo); color:var(--texto); font:15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; padding:0 16px 40px; }
+  header { max-width:1400px; margin:0 auto; padding:22px 0 12px; }
+  h1 { margin:0 0 4px; font-size:22px; }
+  header p { margin:0; color:var(--suave); }
+  .barra { max-width:1400px; margin:0 auto 16px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; position:sticky; top:0; background:var(--fundo); padding:10px 0; z-index:5; }
+  .barra button, .barra select, .barra input { font:inherit; padding:8px 12px; border:1px solid var(--linha); border-radius:8px; background:var(--cartao); color:var(--texto); }
+  .barra button { cursor:pointer; }
+  .barra button.on { background:var(--destaque); border-color:var(--destaque); color:#fff; }
+  .barra input { flex:1 1 180px; min-width:0; }
+  #contagem { color:var(--suave); margin-left:auto; }
+  #grade { max-width:1400px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
+  .kit { background:var(--cartao); border:1px solid var(--linha); border-radius:12px; padding:12px; cursor:pointer; text-align:left; font:inherit; color:inherit; }
+  .kit:hover { border-color:var(--destaque); }
+  .kit img { display:block; width:100%; height:auto; }
+  .kit .tampa { max-width:200px; margin:0 auto 10px; aspect-ratio:1; object-fit:contain; }
+  .kit .nome { font-weight:600; margin-top:8px; }
+  .kit .info { color:var(--suave); font-size:13px; }
+  #vazio { max-width:1400px; margin:30px auto; color:var(--suave); }
+  dialog { border:0; border-radius:14px; padding:0; width:min(1200px, 96vw); max-height:94vh; background:var(--cartao); color:var(--texto); }
+  dialog::backdrop { background:rgba(0,0,0,.6); }
+  .corpo { padding:16px; overflow:auto; max-height:94vh; }
+  .topo { display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+  .topo h2 { margin:0; font-size:18px; flex:1 1 auto; }
+  .topo button { font:inherit; padding:7px 12px; border:1px solid var(--linha); border-radius:8px; background:var(--cartao); color:var(--texto); cursor:pointer; }
+  .grandes img { display:block; max-width:100%; height:auto; margin:0 auto 14px; }
+  .grandes .tampa { max-height:62vh; width:auto; }
+  .legenda { color:var(--suave); font-size:13px; text-align:center; margin:-8px 0 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Rótulos Rota do Caribe e Veleiros do Caribe</h1>
+  <p>Todos os kits produzidos: tampa e tarja. Clique em um kit para ampliar.</p>
+</header>
+<div class="barra">
+  <button data-marca="" class="on">Todas</button>
+  <button data-marca="Rota do Caribe">Rota</button>
+  <button data-marca="Veleiros do Caribe">Veleiros</button>
+  <select id="lote"><option value="">Todos os lotes</option></select>
+  <input id="busca" type="search" placeholder="Buscar (ex.: Tipo AB, Pistache)">
+  <span id="contagem"></span>
+</div>
+<main id="grade"></main>
+<p id="vazio" hidden>Nenhum kit com esse filtro.</p>
+<dialog id="modal"><div class="corpo">
+  <div class="topo"><h2 id="mTitulo"></h2><button id="mAnt">‹ Anterior</button><button id="mProx">Próximo ›</button><button id="mFechar">Fechar</button></div>
+  <div class="grandes"><img id="mTampa" class="tampa" alt=""><p class="legenda">Tarja (190 × 17 mm)</p><img id="mTarja" alt=""></div>
+</div></dialog>
+<script src="kits.js"></script>
+<script>
+const KITS = window.KITS || [];
+const $ = (s) => document.querySelector(s);
+const est = { marca: '', lote: '', busca: '' };
+let visiveis = [], atual = -1;
+const norm = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const lotes = [...new Set(KITS.map((k) => k.lote))];
+$('#lote').append(...lotes.map((l) => Object.assign(document.createElement('option'), { value: l, textContent: l })));
+function curto(m) { return m.replace(' do Caribe', ''); }
+function desenhar() {
+  visiveis = KITS.filter((k) => (!est.marca || k.marca === est.marca) && (!est.lote || k.lote === est.lote) && (!est.busca || norm(`${k.nome} ${k.marca} ${k.lote}`).includes(est.busca)));
+  const g = $('#grade'); g.textContent = '';
+  visiveis.forEach((k, i) => {
+    const b = document.createElement('button'); b.className = 'kit'; b.type = 'button';
+    b.innerHTML = `<img class="tampa" loading="lazy" alt=""><img class="tarja" loading="lazy" alt=""><div class="nome"></div><div class="info"></div>`;
+    b.querySelector('.tampa').src = `img/${k.id}-tampa.webp`; b.querySelector('.tarja').src = `img/${k.id}-tarja.webp`;
+    b.querySelector('.nome').textContent = k.nome; b.querySelector('.info').textContent = `${curto(k.marca)} · ${k.lote}`;
+    b.onclick = () => abrir(i); g.append(b);
+  });
+  $('#contagem').textContent = `${visiveis.length} de ${KITS.length} kits`;
+  $('#vazio').hidden = visiveis.length > 0;
+}
+function abrir(i) {
+  atual = (i + visiveis.length) % visiveis.length; const k = visiveis[atual];
+  $('#mTitulo').textContent = `${k.nome} · ${curto(k.marca)} · ${k.lote}`;
+  $('#mTampa').src = `img/${k.id}-tampa.webp`; $('#mTarja').src = `img/${k.id}-tarja.webp`;
+  if (!$('#modal').open) $('#modal').showModal();
+}
+document.querySelectorAll('[data-marca]').forEach((b) => b.onclick = () => { est.marca = b.dataset.marca; document.querySelectorAll('[data-marca]').forEach((x) => x.classList.toggle('on', x === b)); desenhar(); });
+$('#lote').onchange = (e) => { est.lote = e.target.value; desenhar(); };
+$('#busca').oninput = (e) => { est.busca = norm(e.target.value.trim()); desenhar(); };
+$('#mFechar').onclick = () => $('#modal').close();
+$('#mAnt').onclick = () => abrir(atual - 1); $('#mProx').onclick = () => abrir(atual + 1);
+$('#modal').addEventListener('click', (e) => { if (e.target === $('#modal')) $('#modal').close(); });
+document.addEventListener('keydown', (e) => { if (!$('#modal').open) return; if (e.key === 'ArrowLeft') abrir(atual - 1); if (e.key === 'ArrowRight') abrir(atual + 1); });
+desenhar();
+</script>
+</body>
+</html>
