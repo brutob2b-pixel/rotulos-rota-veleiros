@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador 3D de rótulos</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Barlow+Condensed:wght@500;700&family=Syne:wght@400;800&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;height:100%;background:#17120f}
+  three-d-stage:not(:defined){visibility:hidden}
+  three-d-stage{display:block;width:100vw;height:100vh}
+  #up{position:fixed;top:20px;left:20px;z-index:5;display:flex;flex-direction:column;gap:12px;
+      width:250px;padding:16px;border-radius:12px;background:rgba(12,9,8,.82);
+      max-height:calc(100vh - 40px);overflow-y:auto;
+      border:1px solid rgba(217,164,65,.35);backdrop-filter:blur(8px);
+      font-family:"Barlow Condensed",system-ui,sans-serif;color:#f3e2c4}
+  #toggleUp{display:none}
+  @media (max-width:760px) and (orientation:portrait){
+    #up{left:0;right:0;top:auto;bottom:0;width:auto;max-height:70vh;
+        border-radius:16px 16px 0 0;padding-top:56px;transition:max-height .2s ease}
+    #up.recolhido{max-height:84px;overflow:hidden}
+    #toggleUp{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;position:absolute;top:0;left:0;right:0;height:50px;padding-top:7px;box-sizing:border-box;cursor:grab;touch-action:none;z-index:2;-webkit-tap-highlight-color:transparent;user-select:none}
+    #toggleUp .puxador{width:52px;height:5px;border-radius:3px;background:rgba(217,164,65,.7);transition:.15s}
+    #toggleUp .rotulo{display:flex;align-items:center;gap:6px;padding:4px 14px 4px 10px;border-radius:20px;font:600 12px/1 "Barlow Condensed",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#f3d590;border:1px solid rgba(217,164,65,.55);background:rgba(217,164,65,.14)}
+    #toggleUp .rotulo svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+    #up:not(.recolhido) #toggleUp .rotulo svg{transform:rotate(180deg)}
+    #toggleUp:active .puxador{width:64px;background:#e0b25c}
+    #up.recolhido #toggleUp .rotulo{animation:dicaAlca 1.4s ease-in-out 2.5s 3}
+    @keyframes dicaAlca{0%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}60%{transform:translateY(0)}75%{transform:translateY(-2px)}}
+    #up.arrastando{transition:none!important;overflow:hidden}
+    three-d-stage{height:100vh}
+  }
+  #up h1{margin:0;font-family:Cinzel,serif;font-size:14px;letter-spacing:.12em;color:#e0b25c;font-weight:700}
+  #up p{margin:0;font-size:13px;line-height:1.35;color:#bda98c}
+  .drop{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:8px;cursor:pointer;
+        border:1px dashed rgba(217,164,65,.5);background:rgba(176,17,24,.10);transition:.15s}
+  .drop:hover,.drop.over{background:rgba(176,17,24,.28);border-color:#e0b25c}
+  .drop b{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#f6e8cc}
+  .drop span{font-size:12px;color:#bda98c}
+  .drop img{width:100%;height:62px;object-fit:cover;border-radius:5px;display:none}
+  .drop.has img{display:block}
+  #up button{all:unset;text-align:center;padding:8px;border-radius:7px;cursor:pointer;font-size:12px;
+             letter-spacing:.1em;text-transform:uppercase;color:#bda98c;border:1px solid rgba(217,164,65,.3)}
+  #up button:hover{color:#f6e8cc;border-color:#e0b25c}
+  /* mosaico de funções: ícones vazados (traço), sem emoji */
+  #up .mosaico{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  #up .mosaico button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+        aspect-ratio:1/.92;padding:6px 3px;font-size:10px;line-height:1.15;letter-spacing:.06em;
+        border-radius:9px;background:rgba(217,164,65,.05);transition:.12s}
+  #up .mosaico button:hover{background:rgba(176,17,24,.22)}
+  #up .mosaico button:active{transform:scale(.96)}
+  #up .mosaico button[hidden]{display:none}
+  #up .mosaico button:disabled{opacity:.4;cursor:default;pointer-events:none}
+  #up .mosaico .ic{width:25px;height:25px;flex:none;fill:none;stroke:#e0b25c;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  #up .mosaico button:hover .ic{stroke:#f6e8cc}
+  #up input{display:none}
+  #up .cores{display:flex;gap:10px}
+  #up .cores label{flex:1;display:flex;flex-direction:column;gap:4px;font-size:12px;letter-spacing:.08em;
+                   text-transform:uppercase;color:#bda98c}
+  #up .cores input[type=color]{display:block;width:100%;height:32px;border:1px solid rgba(217,164,65,.3);
+                   border-radius:6px;background:transparent;padding:2px;cursor:pointer}
+  #up .dl{display:flex;gap:8px}
+  #up .dl a{flex:1;text-align:center;padding:8px 4px;border-radius:7px;font-size:12px;letter-spacing:.08em;
+            text-transform:uppercase;color:#e0b25c;text-decoration:none;border:1px solid rgba(217,164,65,.3)}
+  #up .dl a:hover{color:#f6e8cc;border-color:#e0b25c;background:rgba(176,17,24,.2)}
+  /* ---------- escolha da marca (primeira tela) ---------- */
+  #escolhaMarca{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;
+                background:rgba(12,9,8,.94);backdrop-filter:blur(6px);overflow-y:auto;font-family:"Barlow Condensed",system-ui,sans-serif}
+  #escolhaMarca[hidden]{display:none}
+  #escolhaMarca .em-caixa{width:min(760px,100%);text-align:center;margin:auto}
+  #escolhaMarca h2{margin:0 0 6px;font-family:Cinzel,serif;font-size:clamp(20px,5vw,28px);letter-spacing:.06em;color:#e0b25c}
+  #escolhaMarca .em-sub{margin:0 0 20px;font-size:16px;color:#bda98c}
+  #escolhaMarca .em-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  #escolhaMarca .em-marca{all:unset;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;cursor:pointer;
+                border-radius:14px;border:1px solid rgba(217,164,65,.35);background:rgba(217,164,65,.06);transition:.15s}
+  #escolhaMarca .em-marca:hover,#escolhaMarca .em-marca:focus-visible{border-color:#e0b25c;background:rgba(176,17,24,.25)}
+  #escolhaMarca .em-marca img{width:104px;height:104px;border-radius:50%;object-fit:cover;background:#0b0708}
+  #escolhaMarca .em-marca img.frasco{border-radius:10px;object-fit:contain;width:64px}
+  #escolhaMarca .em-marca b{font-size:19px;letter-spacing:.04em;color:#f6e8cc}
+  #escolhaMarca .em-marca span{font-size:14px;color:#bda98c}
+  #up .marcas .b.trocar{color:#f3d590;border-color:rgba(217,164,65,.6);background:rgba(217,164,65,.14)}
+  #up .marcas{display:flex;gap:6px;flex-wrap:wrap}
+  #up .marcas .b{padding:5px 10px;border-radius:20px;font-size:11px;letter-spacing:.04em;
+                 text-transform:uppercase;color:#bda98c;border:1px solid rgba(217,164,65,.28);cursor:pointer}
+  #up .marcas .b.on{color:#0b0708;background:#e0b25c;border-color:#e0b25c}
+  #up .lib{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  #up .lib figure{margin:0;position:relative;border-radius:6px;overflow:hidden;cursor:pointer;
+                  border:1px solid rgba(217,164,65,.28);background:#0b0708;aspect-ratio:1}
+  #up .lib figure:hover{border-color:#e0b25c}
+  #up .lib figure.ativo{border:2px solid #e0b25c;box-shadow:0 0 0 2px rgba(224,178,92,.35) inset}
+  #up .lib img{width:100%;height:100%;object-fit:contain;display:block}
+  #up .lib figcaption{position:absolute;left:0;right:0;bottom:0;padding:3px 5px;font-size:10.5px;
+                      line-height:1.2;letter-spacing:.02em;color:#f6e8cc;background:rgba(8,5,4,.82);
+                      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #up .lib .act{position:absolute;top:2px;right:2px;display:flex;gap:2px;opacity:.82;transition:.12s}
+  #up .lib figure:hover .act{opacity:1}
+  #up .lib .act span{width:19px;height:19px;display:grid;place-items:center;border-radius:4px;
+                     font-size:11px;color:#f6e8cc;background:rgba(8,5,4,.9)}
+  #up .lib .act span:hover{background:#b01118}
+  #up .lib .selo{position:absolute;left:2px;right:2px;bottom:29px;padding:1px 2px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:0;white-space:nowrap;overflow:hidden;text-transform:uppercase;text-align:center;color:#fff;background:rgba(176,17,24,.92)}
+  #up .lib .tag{position:absolute;top:2px;left:2px;padding:1px 4px;border-radius:4px;font-size:8px;
+                letter-spacing:.08em;color:#0b0708;background:#e0b25c}
+  #up .lib .check{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+                  background:#e0b25c;color:#0b0708;display:grid;place-items:center;font-size:10px;font-weight:700}
+  #up .vazio{font-size:12px;color:#8d7f6c;font-style:italic}
+  #up hr{border:none;border-top:1px solid rgba(217,164,65,.22);margin:2px 0}
+  /* celular: biblioteca primeiro, em faixa deslizável — recolhido mostra
+     título + filtro de marca + kits, para trocar de kit vendo o pote */
+  @media (max-width:760px) and (orientation:portrait){
+    #up.recolhido{max-height:210px;overflow:hidden}
+    /* recolhido: só a faixa de kits; o resto (uploads, botões, cores) aparece ao puxar a alça */
+    #up.recolhido > :not(#tituloLib):not(#marcasBar):not(#lib):not(#vazioLib):not(#toggleUp){display:none}
+    #tituloLib{order:-4} #marcasBar{order:-3} #lib{order:-2} #vazioLib{order:-1}
+    #up .lib{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:none;padding-bottom:2px}
+    #up .lib::-webkit-scrollbar{display:none}
+    #up .lib figure{flex:0 0 76px}
+    #up .marcas{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;flex:none}
+    #up .marcas::-webkit-scrollbar{display:none}
+    #up .marcas .b{white-space:nowrap}
+  }
+  /* celular deitado: a barra sai da parte de baixo e vira painel lateral; o pote fica centralizado no espaço restante */
+  @media (max-height:500px) and (orientation:landscape){
+    #up{top:0;left:0;bottom:0;width:230px;max-height:none;box-sizing:border-box;padding:14px;
+        border-radius:0 16px 16px 0}
+    #toggleUp{display:none}
+  }
+  /* ---------- assinatura UP Co. (identidade: teal #57999B, Syne + DM Sans, linha LED) ---------- */
+  :root{--up-teal:#57999B;--up-bg:rgba(15,15,15,.85);--up-mid:#888888;--up-white:#F2F2F2}
+  .up-selo{display:inline-flex;align-items:baseline;gap:4px;padding:5px 11px 5px 10px;border-radius:20px;background:var(--up-bg);
+           border:1px solid rgba(87,153,155,.25);box-shadow:0 4px 16px rgba(0,0,0,.35);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+           line-height:1;white-space:nowrap;user-select:none}
+  .up-selo .by{font:400 8.5px "DM Sans",system-ui,sans-serif;color:var(--up-mid);letter-spacing:.04em}
+  .up-selo .up{font:800 13px Syne,"DM Sans",system-ui,sans-serif;color:var(--up-white);letter-spacing:-.02em}
+  .up-selo .dash{font:600 13px "DM Sans",system-ui,sans-serif;color:var(--up-teal)}
+  .up-selo .co{font:400 13px Syne,"DM Sans",system-ui,sans-serif;color:var(--up-mid)}
+  #assinaturaUP{position:fixed;top:14px;right:14px;z-index:40;pointer-events:none}
+  .up-led{height:1px;background:linear-gradient(90deg,transparent 0%,rgba(87,153,155,.45) 15%,rgba(87,153,155,.85) 50%,rgba(87,153,155,.45) 85%,transparent 100%)}
+  .up-credito{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+  .up-credito .linha{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .up-credito .txt{font:400 10px "DM Sans",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--up-mid)}
+  .up-rodape{margin-top:26px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .up-rodape .up-led{align-self:stretch}
+  .up-rodape .slogan{margin:0;font:400 12px "DM Sans",system-ui,sans-serif;color:var(--up-mid);letter-spacing:.02em}
+  .up-rodape .slogan b{color:var(--up-teal);font-weight:600}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="i-baixar" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10.5 5 5 5-5"/><path d="M5 20h14"/></symbol><symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol><symbol id="i-pause" viewBox="0 0 24 24"><path d="M8.5 5v14M15.5 5v14"/></symbol><symbol id="i-abrir" viewBox="0 0 24 24"><path d="M4 13.5h16V20H4z"/><path d="M5 10 17.5 4.5"/></symbol><symbol id="i-fechar" viewBox="0 0 24 24"><path d="M4 9h16v4H4z"/><path d="M5.5 13h13v7h-13z"/></symbol><symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="6" width="12.5" height="12" rx="2.2"/><path d="M15.5 10.5 21 7.5v9l-5.5-3z"/></symbol><symbol id="i-pdf" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></symbol><symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"/><path d="M4 4v5h5"/></symbol><symbol id="i-html" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/></symbol><symbol id="i-png" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.2"/><circle cx="9" cy="10" r="1.6"/><path d="m3 17 5-5 4 4 3-3 6 5"/></symbol></svg>
+<script type="application/json" id="bibliotecaEmbutida">{"artes":[]}</script>
+<three-d-stage name="pote-simulador-3d" background="#1d1714" autorotate></three-d-stage>
+<div id="escolhaMarca" role="dialog" aria-modal="true" aria-labelledby="emTitulo">
+  <div class="em-caixa">
+    <h2 id="emTitulo">Qual marca você quer ver?</h2>
+    <p class="em-sub">Toque na marca para abrir o simulador 3D.</p>
+    <div class="em-grade" id="emGrade"><p class="em-sub">Carregando marcas…</p></div>
+    <div class="up-rodape"><div class="up-led"></div><div class="up-selo"><span class="by">by</span><span class="up">UP</span><span class="dash">—</span><span class="co">Co.</span></div><p class="slogan">Simulador 3D desenvolvido por UP Co. · <b>o sócio que faltava</b></p></div>
+  </div>
+</div>
+<div id="assinaturaUP" class="up-selo" title="Desenvolvido por UP Co. — o sócio que faltava"><span class="by">by</span><span class="up">UP</span><span class="dash">—</span><span class="co">Co.</span></div>
+<div id="up">
+  <div id="toggleUp" role="button" tabindex="0" aria-expanded="false" title="Toque ou arraste para cima para ver mais opções"><span class="puxador"></span><span class="rotulo"><svg viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></svg><span class="txt">Mais opções</span></span></div>
+  <h1>SUA ARTE</h1>
+  <p>Suba as duas artes para substituir os rótulos do mockup.</p>
+  <label class="drop" id="dropTop">
+    <b>Tampa</b><span>disco completo (1:1)</span>
+    <img id="prevTop" alt="">
+    <input type="file" id="fileTop" accept="image/*">
+  </label>
+  <label class="drop" id="dropWrap">
+    <b>Corpo · tarja</b>    <span>faixa da tarja (o formato muda conforme a marca). A arte é encaixada preservando a proporção original (nunca esticada).</span>
+    <img id="prevWrap" alt="">
+    <input type="file" id="fileWrap" accept="image/*">
+  </label>
+  <div class="cores">
+    <label>Cor do pote<input type="color" id="corPote" value="#0f0e0f"></label>
+    <label>Cor da tampa<input type="color" id="corTampaPlastico" value="#0f0e0f"></label>
+  </div>
+  <div class="mosaico">
+    <button id="girar"><svg class="ic" viewBox="0 0 24 24"><use href="#i-play"/></svg><span class="tx">Girar</span></button>
+    <button id="abrirTampa"><svg class="ic" viewBox="0 0 24 24"><use href="#i-abrir"/></svg><span class="tx">Abrir tampa</span></button>
+    <button id="gravarVideo" title="Gravar vídeo da abertura da tampa"><svg class="ic" viewBox="0 0 24 24"><use href="#i-video"/></svg><span class="tx">Gravar vídeo</span></button>
+    <button id="pdf" title="Salvar PDF (4 cenários)"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pdf"/></svg><span class="tx">Mockup (PDF)</span></button>
+    <button id="reset" title="Voltar ao original"><svg class="ic" viewBox="0 0 24 24"><use href="#i-reset"/></svg><span class="tx">Original</span></button>
+    <button id="baixarArte" title="Baixar o PDF de impressão (tampa + tarja) do modelo escolhido" hidden><svg class="ic" viewBox="0 0 24 24"><use href="#i-baixar"/></svg><span class="tx">Arte (PDF)</span></button>
+    <button id="baixarAi" title="Baixar os arquivos editáveis (Illustrator) do modelo escolhido" hidden><svg class="ic" viewBox="0 0 24 24"><use href="#i-baixar"/></svg><span class="tx">Arte (AI)</span></button>
+    <button id="exportar" title="Exportar HTML para o cliente"><svg class="ic" viewBox="0 0 24 24"><use href="#i-html"/></svg><span class="tx">Exportar HTML</span></button>
+  </div>
+  <p id="aviso" style="color:#e0b25c"></p>
+  <hr>
+  <h1 id="tituloLib">BIBLIOTECA DE ARTES</h1>
+  <p id="ajudaLib">Artes da pasta <b>artes/</b> do servidor aparecem sozinhas. Arraste PNGs aqui para testar localmente.</p>
+  <label class="drop" id="dropLib">
+    <b>+ Adicionar artes</b><span>PNG/JPG · vários de uma vez</span>
+    <input type="file" id="fileLib" accept="image/*" multiple>
+  </label>
+  <div class="marcas" id="marcasBar" style="display:none"></div>
+  <div class="lib" id="lib"></div>
+  <p class="vazio" id="vazioLib">Nenhuma arte na biblioteca.</p>
+  <div id="gabaritos">
+  <hr>
+  <p>Gabaritos em mm com corte, sangria e área segura — abra no Illustrator.</p>
+  <div class="dl">
+    <a href="#" id="dlTampa">Tampa</a>
+    <a href="#" id="dlCorpo">Corpo</a>
+  </div>
+  </div>
+<script type="text/plain" id="svgTampa"><svg xmlns="http://www.w3.org/2000/svg" width="95mm" height="95mm" viewBox="0 0 95 95" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYToxMWE0MDU3ZC1hOGQ2LTQ1NjUtOWU2Yy1jMGY1MGIxMWZmNTgAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaNXPE0sJ+GN9h3ZyJJgSj98AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDpjZWJiNGFiNy02NmIwLTQ3NzQtYjgyNC00MmE2OWY4MjdmMWVscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoM+ySU4e3TKaiPhzhDk+pXQAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgghWHBfKzmmRq2XF9/mcCa5rd0Ev841M7iUuSO62Cj0QKkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaIj4WjxxW/5/fsOIJ+evArcAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCBOMfnnfaLgKPTFVPuKzo6iwzfQ74XQZNb5lPQtnPy2XmRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBiWZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjExYTQwNTdkLWE4ZDYtNDU2NS05ZTZjLWMwZjUwYjExZmY1OC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmY4NzNmMTFjLTMzNDMtNDBkYy1hNjc4LWJkYzYxYzNmZTkwM3JjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCCFYcF8rOaZGrZcX3+ZwJrmt3QS/zjUzuJS5I7rYKPRAqJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggwZaGVBxKc29nrs8ItqHE0IZ30PF2bzfGxFoEjS+1UU+iY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggrp8G4svFuyoL1Rv0RbEZYpWKaCFOxBI8ejsgNCMY1CJ0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQEdH8PWtB5YWfj5Y9lW7T26FWI04tJIpK4O4odsl4xYeDFZDHa62o/lZAXBp0Jym13Fga6IXl7Iv421PmvxHSeg=</c2pa:manifest></metadata>
+  <title>Gabarito — rótulo da tampa (Ø89,1 mm)</title>
+  <g id="ARTE-AQUI"></g>
+  <g id="GUIAS" fill="none" font-family="Helvetica, Arial, sans-serif">
+    <rect x="0" y="0" width="95" height="95" fill="#ffffff"></rect>
+    <circle cx="47.5" cy="47.5" r="47.5" stroke="#00a3ff" stroke-width="0.25" stroke-dasharray="2 1.5"></circle>
+    <circle cx="47.5" cy="47.5" r="44.55" stroke="#ff0055" stroke-width="0.4"></circle>
+    <circle cx="47.5" cy="47.5" r="40.25" stroke="#12b886" stroke-width="0.25" stroke-dasharray="1.5 1.5"></circle>
+    <path d="M47.5 0v6M47.5 89v6M0 47.5h6M89 47.5h6" stroke="#111" stroke-width="0.2"></path>
+    <g font-size="2.4">
+      <text x="47.5" y="50.4" text-anchor="middle" fill="#9aa0a6" font-size="2.2">centro</text>
+      <text x="4" y="4.4" fill="#00a3ff" font-size="2.2">sangria Ø95 mm</text>
+      <text x="4" y="7.8" fill="#ff0055">corte Ø89,1 mm — exporte só esta área</text>
+      <text x="4" y="11.2" fill="#12b886">área segura Ø80,5 mm</text>
+      <text x="4" y="91" fill="#9aa0a6" font-size="2.2">Exportar: PNG quadrado 1:1, 1400 × 1400 px ou mais</text>
+    </g>
+  </g>
+</svg></script>
+<script type="text/plain" id="svgCorpo"><svg xmlns="http://www.w3.org/2000/svg" width="286mm" height="21mm" viewBox="0 0 286 21" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTpiOTQ4YWJiNC02MTBmLTQ1YzctOGY1Ni03ODg4NmNlODgzYjQAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaCe5l3lxIAUVIMK2UZkT9B0AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo4ODQzM2E4YS0xYzMxLTQ4NjYtOWI1MS0wZWJkOGZkODFhNzlscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNox4/LwqtlB+biI2oiBE1DCgAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgg0tkuMrPZ5xinv8R4AuSgqQNxj4lR873QyWiy087qIN2kZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaA0mtenbVG48CJ66AM8/k+UAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCCpzkAnb0LDiNs0w98PUGSi+nNRomDiagu/LxiTTrGWMWRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBiYZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOmI5NDhhYmI0LTYxMGYtNDVjNy04ZjU2LTc4ODg2Y2U4ODNiNC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjU0ZTk1ZjI2LWFhYzYtNDc0Yi1hYjc4LWY0MGUxZmYyNWI1OHJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCDS2S4ys9nnGKe/xHgC5KCpA3GPiVHzvdDJaLLTzuog3aJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggs0fx4GJ6azqovdTjLqfnrbFy+BytnUgQqwrlMBHVZWSiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggqpepfupRWzNITa+2QzvK9mnpvgD3HcG1g4YJdPGP2bZ0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQFJvKHZgnHZibShoviZpe+cYXSmql6/8FQ/7WWxO+i0O2R8QUXft8KpaRqpWuac8I7xPTsDaBHgyCWJ9oucWyr0=</c2pa:manifest></metadata>
+  <title>Gabarito — tarja do corpo, wrap 360° (280 × 15 mm)</title>
+  <g id="ARTE-AQUI"></g>
+  <g id="GUIAS" fill="none" font-family="Helvetica, Arial, sans-serif">
+    <rect x="0" y="0" width="286" height="21" fill="#ffffff"></rect>
+    <rect x="0.125" y="0.125" width="285.75" height="20.75" stroke="#00a3ff" stroke-width="0.25" stroke-dasharray="2 1.5"></rect>
+    <rect x="3" y="3" width="280" height="15" stroke="#ff0055" stroke-width="0.4"></rect>
+    <rect x="6" y="5.5" width="274" height="10" stroke="#12b886" stroke-width="0.25" stroke-dasharray="1.5 1.5"></rect>
+    <path d="M143 3v15" stroke="#9aa0a6" stroke-width="0.2" stroke-dasharray="1 1"></path>
+    <g font-size="2.2">
+      <text x="5" y="1.9" fill="#00a3ff">sangria 286 × 21 mm</text>
+      <text x="5" y="20.2" fill="#ff0055">corte 280 × 15 mm (circunferência do pote Ø89,1) — área segura 274 × 10 mm — exportar PNG 4096 × 219 px</text>
+      <text x="145.5" y="10.5" fill="#9aa0a6">emenda 360°</text>
+    </g>
+  </g>
+</svg></script>
+<script>
+(function () {
+  function baixar(id, nome) {
+    var src = document.getElementById(id).textContent;
+    var url = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml' }));
+    var a = document.createElement('a');
+    a.href = url; a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+  document.getElementById('dlTampa').addEventListener('click', function (e) {
+    e.preventDefault(); baixar('svgTampa', 'gabarito-tampa.svg');
+  });
+  document.getElementById('dlCorpo').addEventListener('click', function (e) {
+    e.preventDefault(); baixar('svgCorpo', 'gabarito-corpo.svg');
+  });
+})();
+</script>
+  <div class="up-credito"><div class="up-led"></div><div class="linha"><span class="txt">Simulador 3D</span><span class="up-selo"><span class="by">by</span><span class="up">UP</span><span class="dash">—</span><span class="co">Co.</span></span></div></div>
+</div>
+<script src="three-d-stage.js"></script>
+<script type="module">
+const stage = document.querySelector('three-d-stage');
+const { THREE } = await stage.ready;
+await (document.fonts ? document.fonts.ready : Promise.resolve());
+
+const GOLD = '#d9a441', GOLD_HI = '#f6e3a1', RED = '#b01118', RED_DK = '#460508';
+
+function cv(w, h) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  return [c, c.getContext('2d')];
+}
+function tex(canvas, repeatX) {
+  const t = new THREE.CanvasTexture(canvas);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = (stage._renderer && stage._renderer.capabilities.getMaxAnisotropy()) || 16;
+  t.generateMipmaps = true;
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  if (repeatX) { t.wrapS = THREE.RepeatWrapping; t.repeat.x = repeatX; }
+  return t;
+}
+function goldFill(ctx, x0, y0, x1, y1) {
+  const g = ctx.createLinearGradient(x0, y0, x1, y1);
+  g.addColorStop(0, '#8c5a1c'); g.addColorStop(.35, GOLD_HI);
+  g.addColorStop(.55, GOLD); g.addColorStop(.8, '#9c6a22'); g.addColorStop(1, GOLD_HI);
+  return g;
+}
+function ring(ctx, cx, cy, r, w) {
+  ctx.lineWidth = w;
+  ctx.strokeStyle = goldFill(ctx, cx - r, cy - r, cx + r, cy + r);
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+}
+function palm(ctx, x, y, s, color) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.fillStyle = color;
+  ctx.beginPath(); ctx.moveTo(-3, 0); ctx.quadraticCurveTo(2, -60, 14, -104);
+  ctx.lineTo(20, -104); ctx.quadraticCurveTo(8, -58, 5, 0); ctx.closePath(); ctx.fill();
+  for (let i = 0; i < 7; i++) {
+    const a = -Math.PI + i * (Math.PI / 6.2);
+    ctx.beginPath(); ctx.moveTo(16, -104);
+    ctx.quadraticCurveTo(16 + Math.cos(a) * 34, -104 + Math.sin(a) * 30 - 14,
+                         16 + Math.cos(a) * 62, -104 + Math.sin(a) * 40 + 8);
+    ctx.quadraticCurveTo(16 + Math.cos(a) * 32, -104 + Math.sin(a) * 26 + 4, 16, -100);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+function compass(ctx, cx, cy, r) {
+  ctx.save();
+  const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+  bg.addColorStop(0, '#2a0407'); bg.addColorStop(1, '#140203');
+  ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
+  ring(ctx, cx, cy, r * .97, r * .07);
+  ring(ctx, cx, cy, r * .62, r * .035);
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4, len = i % 2 ? r * .42 : r * .86;
+    ctx.fillStyle = goldFill(ctx, cx - r, cy - r, cx + r, cy + r);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+    ctx.lineTo(cx + Math.cos(a + .34) * r * .17, cy + Math.sin(a + .34) * r * .17);
+    ctx.lineTo(cx + Math.cos(a - .34) * r * .17, cy + Math.sin(a - .34) * r * .17);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.fillStyle = GOLD_HI;
+  ctx.font = `700 ${r * .3}px Cinzel, serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  [['N', 0, -r * .78], ['S', 0, r * .78], ['L', r * .78, 0], ['O', -r * .78, 0]]
+    .forEach(([t, dx, dy]) => ctx.fillText(t, cx + dx, cy + dy));
+  ctx.restore();
+}
+function ship(ctx, cx, base, s) {
+  ctx.save(); ctx.translate(cx, base); ctx.scale(s, s);
+  ctx.fillStyle = '#1b0204';
+  ctx.beginPath(); ctx.moveTo(-96, 0); ctx.quadraticCurveTo(0, 40, 96, 0);
+  ctx.lineTo(74, -26); ctx.lineTo(-78, -26); ctx.closePath(); ctx.fill();
+  ctx.fillRect(-3, -230, 6, 205);
+  ctx.fillRect(-62, -180, 5, 155); ctx.fillRect(58, -168, 5, 143);
+  const sail = (x, y, w, h, lean) => {
+    const g = ctx.createLinearGradient(x - w, y, x + w, y + h);
+    g.addColorStop(0, '#7c0a11'); g.addColorStop(.5, '#d2252c'); g.addColorStop(1, '#61070d');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.moveTo(x - w, y); ctx.lineTo(x + w, y);
+    ctx.quadraticCurveTo(x + w + lean, y + h * .6, x + w * .5, y + h);
+    ctx.lineTo(x - w * .8, y + h); ctx.quadraticCurveTo(x - w - lean, y + h * .5, x - w, y);
+    ctx.closePath(); ctx.fill();
+  };
+  sail(0, -218, 34, 70, 14); sail(0, -142, 46, 78, 18); sail(0, -58, 40, 32, 10);
+  sail(-60, -172, 26, 60, 10); sail(58, -160, 24, 56, 10);
+  ctx.restore();
+}
+function seaSky(ctx, w, h) {
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, '#3d0509'); g.addColorStop(.42, '#a7121a');
+  g.addColorStop(.52, '#d8242c'); g.addColorStop(.56, '#6e0a10');
+  g.addColorStop(1, '#210305');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  const sun = ctx.createRadialGradient(w * .27, h * .3, 0, w * .27, h * .3, h * .22);
+  sun.addColorStop(0, 'rgba(255,236,198,.95)'); sun.addColorStop(.5, 'rgba(255,160,120,.25)');
+  sun.addColorStop(1, 'rgba(255,120,90,0)');
+  ctx.fillStyle = sun; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = 'rgba(255,255,255,.10)';
+  for (let i = 0; i < 60; i++) {
+    const y = h * .56 + Math.random() * h * .42;
+    ctx.fillRect(Math.random() * w, y, 30 + Math.random() * 90, 1.5);
+  }
+}
+
+/* ---------- rótulos em branco (base do mockup) ---------- */
+const [topC, tc] = cv(1400, 1400);
+(() => {
+  const S = 1400, cx = S / 2;
+  tc.fillStyle = '#0b0708'; tc.fillRect(0, 0, S, S);
+  tc.save();
+  tc.beginPath(); tc.arc(cx, cx, S * .455, 0, 7); tc.clip();
+  tc.fillStyle = '#f6f3ee'; tc.fillRect(0, 0, S, S);
+  tc.restore();
+})();
+
+const [wrapC, wc] = cv(4096, 219);
+(() => {
+  wc.fillStyle = '#f6f3ee'; wc.fillRect(0, 0, 4096, 219);
+})();
+
+/* ---------- materiais ---------- */
+const plastic = new THREE.MeshStandardMaterial({ name: 'plastico_preto', color: 0x141314, roughness: .28, metalness: .18 });
+const plasticSide = new THREE.MeshStandardMaterial({ name: 'plastico_preto_fosco', color: 0x0f0e0f, roughness: .5, metalness: .1 });
+plasticSide.side = THREE.DoubleSide;   // a parede da tampa precisa aparecer por dentro também (tampa aberta vista de baixo ficava "vazada")
+const gold = new THREE.MeshStandardMaterial({ name: 'dourado', color: 0xe0b25c, roughness: .3, metalness: .38 });
+// textura da pasta: leve redemoinho (como se tivesse sido colhida com uma
+// espátula) + brilho de clearcoat, pra vender "consistência cremosa"
+// em vez de um disco liso — é revelado pela animação de abrir a tampa.
+const [pasteC, pctx] = cv(512, 512);
+function pintaPasta(base) {
+  const S = 512, cx = S / 2;
+  pctx.fillStyle = base; pctx.fillRect(0, 0, S, S);
+  const grad = pctx.createRadialGradient(cx * .92, cx * .85, S * .05, cx, cx, S * .62);
+  grad.addColorStop(0, 'rgba(255,255,255,.55)');
+  grad.addColorStop(.4, 'rgba(255,255,255,.12)');
+  grad.addColorStop(1, 'rgba(0,0,0,.06)');
+  pctx.fillStyle = grad; pctx.fillRect(0, 0, S, S);
+  pctx.strokeStyle = 'rgba(0,0,0,.05)'; pctx.lineWidth = 2.5;
+  for (let r = S * .08; r < S * .5; r += S * .045) {
+    pctx.beginPath();
+    for (let a = 0; a <= Math.PI * 2 + 0.4; a += 0.06) {
+      const rr = r + Math.sin(a * 3 + r) * S * .012;
+      const x = cx + Math.cos(a + r * .01) * rr, y = cx + Math.sin(a + r * .01) * rr;
+      a === 0 ? pctx.moveTo(x, y) : pctx.lineTo(x, y);
+    }
+    pctx.stroke();
+  }
+}
+pintaPasta('#f3dfe2');
+const paste = new THREE.MeshPhysicalMaterial({
+  name: 'pasta_morango', map: tex(pasteC), roughness: .42, metalness: 0,
+  clearcoat: .35, clearcoatRoughness: .2
+});
+/* rótulos brilhantes (verniz/laminação como nos potes reais): verniz transparente por cima da impressão
+   + um "estúdio" de reflexo só para eles (duas softboxes e um piso claro), que cria a faixa de luz ao girar */
+const reflexoEstudio = (() => {
+  // mapa HDR (valores acima de 1): o verniz reflete só ~4% da luz, então as faixas precisam ser bem mais fortes que o fundo
+  const W = 512, H = 256, px = new Uint16Array(W * H * 4), hf = THREE.DataUtils.toHalfFloat;   // half-float: filtra bem também em GPU de celular
+  const suave = (d, w) => Math.max(0, 1 - Math.pow(Math.abs(d) / w, 2));     // borda macia
+  const faixas = [[.12, 13, 5.5], [.37, 9, 3.5], [.62, 13, 5.5], [.87, 9, 3.5]];   // reflexo translúcido: a arte aparece através do brilho    // [posição, meia-largura px, intensidade]
+  for (let y = 0; y < H; y++) {
+    const v = y / H;
+    let base = v < .5 ? .06 + (.5 - v) * .1 : .08 + (v - .5) * .22;          // fundo escuro de estúdio, piso um pouco mais claro
+    let teto = v < .16 ? 3 * (1 - v / .16) : 0;                               // teto claro (brilho do disco da tampa)
+    const altura = suave(v - .48, .2);
+    for (let xx = 0; xx < W; xx++) {
+      let L = base + teto;
+      for (const [p, w, k] of faixas) {
+        let d = xx - p * W; d -= Math.round(d / W) * W;
+        L += k * suave(d, w) * altura;
+      }
+      const o = (y * W + xx) * 4; px[o] = hf(L); px[o + 1] = hf(L * .985); px[o + 2] = hf(L * .96); px[o + 3] = hf(1);
+    }
+  }
+  const t = new THREE.DataTexture(px, W, H, THREE.RGBAFormat, THREE.HalfFloatType);
+  t.mapping = THREE.EquirectangularReflectionMapping; t.magFilter = t.minFilter = THREE.LinearFilter; t.needsUpdate = true;
+  const pm = new THREE.PMREMGenerator(stage._renderer);
+  const env = pm.fromEquirectangular(t).texture; pm.dispose(); t.dispose();
+  return env;
+})();
+// impressão quase sem reflexo próprio (specularIntensity baixo) + verniz bem liso por cima (clearcoat)
+const VERNIZ = { roughness: .5, metalness: 0, specularIntensity: .2, clearcoat: 1, clearcoatRoughness: .05, envMap: reflexoEstudio, envMapIntensity: .85 };
+const labelTop = new THREE.MeshPhysicalMaterial(Object.assign({ name: 'rotulo_tampa', map: tex(topC) }, VERNIZ));
+const labelWrap = new THREE.MeshPhysicalMaterial(Object.assign({ name: 'rotulo_corpo', map: tex(wrapC), transparent: true, alphaTest: .02 }, VERNIZ));
+
+/* ---------- geometria: pote Ø85 × 38 mm ---------- */
+const R = 0.04406, LID_R = 0.0453, BODY_H = 0.020, LID_H = 0.020, OVER = 0.002;
+const TOP_Y = BODY_H + LID_H - OVER;
+const BAND_H = 0.015;
+// "frente" do produto = azimute da câmera inicial (3, 2.2, 4): tarja centralizada e tampa nivelada para esse lado
+const AZ_FRENTE = Math.atan2(3, 4);
+// o bloco principal da tarja (bússola + marca + navio) fica em ~60% da largura da arte; é ele que deve ficar de frente
+const U_FOCO = 0.60;
+const jar = new THREE.Group(); jar.name = 'pote_pasta_modeladora';
+const add = (name, geo, mat, y, rx, ry, rz) => {
+  const m = new THREE.Mesh(geo, mat);
+  m.name = name; m.position.y = y;
+  m.rotation.set(rx || 0, ry || 0, rz || 0);
+  jar.add(m); return m;
+};
+
+// corpo
+// aberto (sem tampas próprias): um cilindro "fechado" (openEnded=false)
+// tem um disco opaco no topo, que tapava a visão da pasta por baixo mesmo
+// com a tampa aberta — abrimos o topo e o fundo e recriamos só o fundo
+// como peça separada, senão o pote fica sem chão visto de baixo.
+// corpo e fundo visíveis dos dois lados: o fundo precisa aparecer visto de baixo
+// (antes era um disco só com a face de cima, e o pote parecia sem base) e a
+// parede interna precisa aparecer com a tampa aberta, olhando para dentro.
+const plasticSide2 = plasticSide.clone(); plasticSide2.side = THREE.DoubleSide;
+add('corpo', new THREE.CylinderGeometry(R, R * .97, BODY_H, 96, 1, true), plasticSide2, BODY_H / 2);
+add('fundo_pote', new THREE.CircleGeometry(R * .97, 96), plasticSide2, 0.0002, Math.PI / 2);
+add('rotulo_corpo', new THREE.CylinderGeometry(0.044563, 0.044563, BAND_H, 96, 1, true), labelWrap, BODY_H / 2 - .0005, 0, AZ_FRENTE - 2 * Math.PI * U_FOCO);   // bloco central da arte (marca + bússola) voltado para a frente
+add('pasta', new THREE.CylinderGeometry(R - .0025, R - .0025, .0005, 64), paste, BODY_H - .0016);
+const plasticFoot = plastic.clone();
+add('base_pe', new THREE.TorusGeometry(R * .94, .0014, 14, 96), plasticFoot, .0014, Math.PI / 2);
+
+// tampa
+add('tampa_lateral', new THREE.CylinderGeometry(LID_R, LID_R, LID_H, 96, 1, true), plasticSide, BODY_H + LID_H / 2 - OVER);
+// raio 0,15 mm menor que a lateral: com o mesmo raio, as duas paredes brigavam na profundidade (z-fighting) e abriam manchas recortadas no arco da tampa
+add('tampa_topo', new THREE.CylinderGeometry(LID_R - .00015, LID_R - .00015, .0035, 96), plastic, TOP_Y - .0018);
+add('rotulo_tampa', new THREE.CircleGeometry(0.04455, 96), labelTop, TOP_Y + .0002, -Math.PI / 2, 0, AZ_FRENTE);   // arte da tampa nivelada vista da frente
+add('aro_base_tampa', new THREE.TorusGeometry(LID_R - .0012, .0012, 14, 128), plastic, BODY_H - OVER + .0004, Math.PI / 2);
+
+/* ---------- agrupa a tampa (peça única, gira em torno do próprio centro) ---------- */
+// pivô no centro vertical da tampa: assim inclinar o grupo tomba a tampa
+// "na mão", em vez de girar em torno da base do pote.
+const LID_PIVOT_Y = BODY_H + LID_H / 2 - OVER;
+const tampaGroup = new THREE.Group();
+tampaGroup.name = 'tampa';
+tampaGroup.position.y = LID_PIVOT_Y;
+['tampa_lateral', 'tampa_topo', 'rotulo_tampa', 'aro_base_tampa'].forEach(n => {
+  const m = jar.getObjectByName(n);
+  jar.remove(m);
+  m.position.y -= LID_PIVOT_Y;
+  tampaGroup.add(m);
+});
+jar.add(tampaGroup);
+
+jar.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+stage.setObject(jar);
+
+/* ---------- animação: abrir/fechar a tampa ---------- */
+// tudo aqui força um render manual a cada frame do tween — o loop do
+// stage só redesenha sob demanda, então uma animação externa como esta
+// tem que avisar (stage.requestRender()) ou fica "congelada" na tela.
+const LID_CLOSED = { y: LID_PIVOT_Y, x: 0, z: 0, rz: 0, rx: 0 };
+const LID_OPEN = { y: LID_PIVOT_Y + 0.05, x: 0.034, z: 0.006, rz: -0.62, rx: 0.16 };
+let lidState = 'closed'; // 'closed' | 'open' | 'animating'
+let lidTween = null;
+const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function tweenTampa(to, duration, onDone) {
+  if (lidTween) cancelAnimationFrame(lidTween.raf);
+  const from = {
+    y: tampaGroup.position.y, x: tampaGroup.position.x, z: tampaGroup.position.z,
+    rz: tampaGroup.rotation.z, rx: tampaGroup.rotation.x
+  };
+  const t0 = performance.now();
+  lidTween = { raf: 0 };
+  const step = now => {
+    const t = Math.min(1, (now - t0) / duration);
+    const k = easeInOutCubic(t);
+    tampaGroup.position.set(from.x + (to.x - from.x) * k, from.y + (to.y - from.y) * k, from.z + (to.z - from.z) * k);
+    tampaGroup.rotation.z = from.rz + (to.rz - from.rz) * k;
+    tampaGroup.rotation.x = from.rx + (to.rx - from.rx) * k;
+    stage.requestRender();
+    if (t < 1) { lidTween.raf = requestAnimationFrame(step); }
+    else { lidTween = null; if (onDone) onDone(); }
+  };
+  lidTween.raf = requestAnimationFrame(step);
+}
+// a tampa levantada e inclinada fica entre a luz principal e a pasta —
+// se continuar projetando sombra, a pasta que a animação deveria mostrar
+// escurece na hora exata em que devia aparecer. Sem sombra da tampa
+// durante a abertura; volta a projetar sombra (o filete embaixo da borda)
+// só quando fechada de novo.
+function setTampaCastShadow(v) {
+  tampaGroup.traverse(o => { if (o.isMesh) o.castShadow = v; });
+}
+function abrirTampaFn(duration) {
+  return new Promise(resolve => {
+    lidState = 'animating';
+    setTampaCastShadow(false);
+    tweenTampa(LID_OPEN, duration != null ? duration : 900, () => { lidState = 'open'; resolve(); });
+  });
+}
+function fecharTampaFn(duration) {
+  return new Promise(resolve => {
+    lidState = 'animating';
+    tweenTampa(LID_CLOSED, duration != null ? duration : 900, () => {
+      lidState = 'closed'; setTampaCastShadow(true); stage.requestRender(); resolve();
+    });
+  });
+}
+abrirTampa.addEventListener('click', () => {
+  if (lidState === 'animating') return;
+  if (lidState === 'closed') {
+    rot(abrirTampa, 'Fechar tampa', 'fechar');
+    abrirTampaFn();
+  } else {
+    rot(abrirTampa, 'Abrir tampa', 'abrir');
+    fecharTampaFn();
+  }
+});
+
+/* ---------- gravar a abertura como vídeo (.webm ou .mp4, o que o navegador suportar) ---------- */
+function escolherMimeType() {
+  const opcoes = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+  for (const t of opcoes) { if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) return t; }
+  return '';
+}
+gravarVideo.addEventListener('click', async () => {
+  if (lidState === 'animating' || gravarVideo.disabled) return;
+  if (!window.MediaRecorder || !stage._renderer.domElement.captureStream) {
+    aviso.textContent = 'Este navegador não suporta gravação de vídeo direto da tela (captureStream/MediaRecorder).';
+    return;
+  }
+  const oldAutoRotate = stage._controls.autoRotate;
+  stage._controls.autoRotate = false;
+  // canvas.captureStream() só grava os pixels do canvas — o fundo que
+  // aparece no app é um CSS atrás do canvas (que é transparente, alpha:true),
+  // então sem isto o vídeo sai com fundo preto. Mesmo truque do export de PDF.
+  const oldBG = stage._scene.background;
+  const bgAttr = stage.getAttribute('background');
+  if (bgAttr) stage._scene.background = new THREE.Color(bgAttr);
+  stage.requestRender();
+  abrirTampa.disabled = true;
+  gravarVideo.disabled = true;
+    rot(gravarVideo, 'Gravando…');
+  try {
+    if (lidState !== 'closed') { await fecharTampaFn(400); }
+    const mime = escolherMimeType();
+    const stream = stage._renderer.domElement.captureStream(30);
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    const chunks = [];
+    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    const gravado = new Promise(resolve => { rec.onstop = resolve; });
+    rec.start();
+    await new Promise(r => setTimeout(r, 200)); // um respiro antes de animar, pra não cortar o 1º frame
+    await abrirTampaFn(1400);
+    await new Promise(r => setTimeout(r, 1200)); // segura a tampa aberta um instante, pra dar tempo de ver a pasta
+    rec.stop();
+    await gravado;
+    const blob = new Blob(chunks, { type: mime ? mime.split(';')[0] : 'video/webm' });
+    const ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'pote-abrindo-tampa.' + ext;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    if (ext === 'webm') {
+      aviso.textContent = 'Vídeo baixado em .webm (seu navegador não grava .mp4 direto). Pra usar em Instagram/WhatsApp, converta em cloudconvert.com ou similar — é gratuito e rápido.';
+    } else {
+      aviso.textContent = '';
+    }
+  } catch (e) {
+    aviso.textContent = 'Falha ao gravar o vídeo: ' + e.message;
+  }
+  stage._scene.background = oldBG;
+  stage.requestRender();
+  rot(gravarVideo, 'Gravar vídeo');
+  abrirTampa.disabled = false;
+  gravarVideo.disabled = false;
+  lidState === 'open' ? rot(abrirTampa, 'Fechar tampa', 'fechar') : rot(abrirTampa, 'Abrir tampa', 'abrir');
+  stage._controls.autoRotate = oldAutoRotate;
+});
+
+/* ---------- upload das artes do usuário ---------- */
+const KEY = 'veleiros-labels';
+// proporção real de cada rótulo: a arte é encaixada dentro (contain), nunca esticada
+const MAXTEX = Math.min(8192, (stage._renderer && stage._renderer.capabilities.maxTextureSize) || 4096);
+const FIT = { top: [Math.min(2048, MAXTEX), Math.min(2048, MAXTEX)], wrap: [MAXTEX, Math.round(MAXTEX * 15 / 280)] };
+const slots = {
+  top: { mat: labelTop, base: labelTop.map, prev: prevTop, drop: dropTop, input: fileTop, repeat: 0 },
+  wrap: { mat: labelWrap, base: labelWrap.map, prev: prevWrap, drop: dropWrap, input: fileWrap, repeat: 0 }
+};
+const store = JSON.parse(localStorage.getItem(KEY) || '{}');
+
+/* ---------- geometria por kit ----------
+   Padrão = Veleiros: corpo 20 mm, tarja 360° de 280 × 15 mm, arte da tampa Ø89,1.
+   Campos opcionais do kit no artes.json:
+     alt      altura (mm) de uma tarja 360° com 280 mm de volta (ex.: Jack Fera 19,1)
+     tampaMm  diâmetro da arte da tampa (ex.: 85)
+     foco     0–1: ponto da largura da tarja 360° que fica de frente
+     pote     { tarjaMm: [comprimento, altura], respiroMm: 3, corpoMm }  → pote mais alto com tarja parcial
+              (adesivo frontal centralizado). Sem corpoMm: altura da tarja + respiro em cima e embaixo.
+     corPasta cor do produto dentro do pote (ex.: gel)
+   A tampa nunca muda de forma. */
+let _verts = null;   // cache de vértices do enquadramento do PDF (zerado quando o pote muda)
+const GEO_PADRAO = { alt: 15, tampa: 89.1, foco: null, pote: null, corPasta: null, acabamento: null };
+const COR_PASTA_PADRAO = '#f3dfe2';
+let GEO = Object.assign({}, GEO_PADRAO, store.geo || {});
+let POTE_CHAVE = JSON.stringify([BODY_H * 1000, null, 3]), TARJA_PARCIAL = false;
+function montaPote(p) {
+  p = p || {};
+  const tarja = p.tarjaMm || null;
+  const resp = p.respiroMm != null ? p.respiroMm : 3;
+  const corpoMm = p.corpoMm || (tarja ? OVER * 1000 + tarja[1] + 2 * resp : BODY_H * 1000);
+  const chave = JSON.stringify([corpoMm, tarja, resp]);
+  if (chave === POTE_CHAVE) return;
+  POTE_CHAVE = chave;
+  const H = corpoMm / 1000, rBase = R * .97;
+  const rCorpo = y => rBase + (R - rBase) * y / H;          // raio do corpo (levemente cônico) na altura y
+  const troca = (nome, geo, y) => { const m = jar.getObjectByName(nome); m.geometry.dispose(); m.geometry = geo; m.position.y = y; };
+  troca('corpo', new THREE.CylinderGeometry(R, rBase, H, 96, 1, true), H / 2);
+  jar.getObjectByName('pasta').position.y = H - .0016;
+  if (tarja) {
+    // adesivo frontal: arco centralizado na frente, no meio da área visível (base até a borda da tampa)
+    const a = tarja[1] / 1000, yc = (H - OVER) / 2, y0 = yc - a / 2;
+    const rT = rCorpo(y0 + a) + .0004, rB = rCorpo(y0) + .0004;
+    const arco = (tarja[0] / 1000) / ((rT + rB) / 2);
+    troca('rotulo_corpo', new THREE.CylinderGeometry(rT, rB, a, 96, 1, true, AZ_FRENTE - arco / 2, arco), yc);
+  } else {
+    troca('rotulo_corpo', new THREE.CylinderGeometry(0.044563, 0.044563, BAND_H, 96, 1, true), H / 2 - .0005);
+  }
+  TARJA_PARCIAL = !!tarja;
+  LID_CLOSED.y = H + LID_H / 2 - OVER;
+  LID_OPEN.y = LID_CLOSED.y + 0.05;
+  tampaGroup.position.y = lidState === 'open' ? LID_OPEN.y : LID_CLOSED.y;
+  _verts = null;
+  stage.setObject(jar);          // reenquadra a câmera no pote novo
+}
+function aplicaGeo(g) {
+  GEO = Object.assign({}, GEO_PADRAO);
+  Object.entries(g || {}).forEach(([k, v]) => { if (v != null) GEO[k] = v; });   // campos ausentes no kit mantêm o padrão
+  montaPote(GEO.pote);
+  const faixa = jar.getObjectByName('rotulo_corpo'), disco = jar.getObjectByName('rotulo_tampa');
+  if (TARJA_PARCIAL) { faixa.scale.y = 1; faixa.rotation.y = 0; }
+  else {
+    faixa.scale.y = GEO.alt / 15;
+    faixa.rotation.y = AZ_FRENTE - 2 * Math.PI * (GEO.foco != null ? GEO.foco : U_FOCO);
+  }
+  disco.scale.set(GEO.tampa / 89.1, GEO.tampa / 89.1, 1);
+  const corP = GEO.corPasta || COR_PASTA_PADRAO;
+  if (corP !== pintaPasta.atual) { pintaPasta(corP); pintaPasta.atual = corP; paste.map.needsUpdate = true; }
+  aplicaAcabamento(GEO.acabamento);
+  store.geo = GEO;
+  stage.requestRender();
+}
+/* ---------- acabamento do pote por kit: cor + pintura metálica com flocos discretos (tipo pintura automotiva) ----------
+   kit no artes.json: "acabamento": { "cor": "#62388e", "glitter": true } — vale para corpo e tampa */
+const PECAS_POTE = ['corpo', 'fundo_pote', 'base_pe'], PECAS_TAMPA = ['tampa_lateral', 'tampa_topo', 'aro_base_tampa'];
+const MAT_ORIGINAL = new Map([...PECAS_POTE, ...PECAS_TAMPA].map(n => [n, jar.getObjectByName(n).material]));
+const flocos = (() => {   // normal map com milhares de flocos minúsculos inclinados: cintilam só quando pegam luz
+  const S = 512, [c, x] = cv(S, S);
+  x.fillStyle = 'rgb(128,128,255)'; x.fillRect(0, 0, S, S);
+  for (let i = 0; i < 14000; i++) {
+    const a = Math.random() * Math.PI * 2, k = 40 + Math.random() * 80;
+    x.fillStyle = `rgb(${Math.round(128 + Math.cos(a) * k)},${Math.round(128 + Math.sin(a) * k)},${Math.round(255 - k * .6)})`;
+    x.fillRect(Math.random() * S, Math.random() * S, 1 + (Math.random() < .3), 1 + (Math.random() < .3));
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace;
+  return t;
+})();
+// repetição por peça para os flocos ficarem redondos e do mesmo tamanho (~20 mm por ladrilho de 512 px)
+const REPETE_FLOCOS = { pote: [14, 2.2], tampaLat: [14, 1], tampaTopo: [4.5, 4.5] };
+const pecaDe = n => PECAS_POTE.includes(n) ? 'pote' : (n === 'tampa_topo' ? 'tampaTopo' : 'tampaLat');
+const pinturas = {};
+function pintura(cor, glitter, peca) {
+  const k = cor + glitter + peca;
+  if (!pinturas[k]) pinturas[k] = new THREE.MeshPhysicalMaterial(Object.assign({
+    name: 'pintura_' + peca, color: cor, side: THREE.DoubleSide,
+    metalness: glitter ? .5 : .1, roughness: glitter ? .36 : .3,
+    clearcoat: 1, clearcoatRoughness: .05, envMap: reflexoEstudio,
+    envMapIntensity: peca === 'tampaTopo' ? .3 : .7   // topo liso da tampa refletia o teto inteiro e ficava branco
+  }, glitter ? { normalMap: (() => { const t = flocos.clone(); t.repeat.set(...REPETE_FLOCOS[peca]); t.needsUpdate = true; return t; })(),
+                 normalScale: new THREE.Vector2(.22, .22) } : {}));
+  return pinturas[k];
+}
+function aplicaAcabamento(ac) {
+  [...PECAS_POTE, ...PECAS_TAMPA].forEach(n => {
+    const m = jar.getObjectByName(n);
+    m.material = ac ? pintura(ac.cor, !!ac.glitter, pecaDe(n)) : MAT_ORIGINAL.get(n);
+  });
+  if (typeof corPote !== 'undefined') {
+    const cor = '#' + jar.getObjectByName('corpo').material.color.getHexString();
+    corPote.value = cor; corTampaPlastico.value = '#' + jar.getObjectByName('tampa_lateral').material.color.getHexString();
+  }
+}
+// proporção da arte da tarja (altura ÷ largura) para o canvas da textura
+const aspectoTarja = () => TARJA_PARCIAL ? GEO.pote.tarjaMm[1] / GEO.pote.tarjaMm[0] : GEO.alt / 280;
+aplicaGeo(GEO);
+
+// modo de encaixe da tarja: sempre "encaixar" (nunca esticar/distorcer a arte)
+const mode = 'contain';
+function applyArt(which, dataURL) {
+  const s = slots[which];
+  const img = new Image();
+  img.onload = () => {
+    const [W, H] = which === 'wrap' ? [FIT.wrap[0], Math.round(FIT.wrap[0] * aspectoTarja())] : FIT.top;
+    const [c, x] = cv(W, H);
+    if (which === 'wrap') x.clearRect(0, 0, W, H);           // tarja: áreas transparentes da arte mostram o pote
+    else { x.fillStyle = '#0b0708'; x.fillRect(0, 0, W, H); }
+    x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high';
+    const k = Math.min(W / img.width, H / img.height);
+    const w = img.width * k, ht = img.height * k;
+    x.drawImage(img, (W - w) / 2, (H - ht) / 2, w, ht);
+    const volta = which === 'wrap' && !TARJA_PARCIAL;   // tarja 360° repete na emenda; o adesivo frontal não
+    const t = tex(c, volta ? 1 : 0);
+    if (volta) t.wrapS = THREE.RepeatWrapping;
+    s.mat.map = t; s.mat.needsUpdate = true;
+    stage.requestRender();
+  };
+  img.src = dataURL;
+  s.prev.src = dataURL; s.drop.classList.add('has');
+}
+function readFile(which, file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    applyArt(which, fr.result);
+    // guarda uma versão reduzida (máx. 3072 px) para caber na cota do navegador
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, (which === 'wrap' ? 8192 : 2048) / im.width);
+      const [c, x] = cv(Math.round(im.width * k), Math.round(im.height * k));
+      x.drawImage(im, 0, 0, c.width, c.height);
+      store[which] = c.toDataURL('image/jpeg', 0.95);
+      try {
+        localStorage.setItem(KEY, JSON.stringify(store));
+        aviso.textContent = '';
+      } catch (e) {
+        aviso.textContent = 'Arte muito grande para salvar — vale só nesta sessão.';
+      }
+    };
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+Object.entries(slots).forEach(([which, s]) => {
+  s.input.addEventListener('change', e => readFile(which, e.target.files[0]));
+  ['dragenter', 'dragover'].forEach(ev => s.drop.addEventListener(ev, e => {
+    e.preventDefault(); s.drop.classList.add('over');
+  }));
+  ['dragleave', 'drop'].forEach(ev => s.drop.addEventListener(ev, e => {
+    e.preventDefault(); s.drop.classList.remove('over');
+  }));
+  s.drop.addEventListener('drop', e => readFile(which, e.dataTransfer.files[0]));
+  if (store[which]) applyArt(which, store[which]);
+});
+/* ---------- export PDF: 4 cenários em alta resolução ---------- */
+const polar = (az, el) => [Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)];
+const CENAS = [
+  { nome: '3/4 frontal',   dir: polar(AZ_FRENTE - 0.40, 0.35) },            // centro da tarja ainda visível
+  { nome: 'frente',        dir: polar(AZ_FRENTE, 0.16) },                   // centro da tarja de frente
+  { nome: 'topo',          dir: polar(AZ_FRENTE, 0.97) },                   // arte da tampa nivelada
+  { nome: '3/4 posterior', dir: polar(AZ_FRENTE + Math.PI + 0.70, 0.26) }
+];
+const PX = [3300, 2160]; // ~300 dpi, proporção da área útil do A4 paisagem
+
+function vertices() {
+  if (_verts) return _verts;
+  const out = [], v = new THREE.Vector3();
+  stage._object.updateMatrixWorld(true);
+  stage._object.traverse(o => {
+    if (!o.isMesh) return;
+    const p = o.geometry.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld);
+      out.push(v.x, v.y, v.z);
+    }
+  });
+  _verts = out;
+  return out;
+}
+
+function renderCena(dir, roll) {
+  const r = stage._renderer, cam = stage._camera, ctr = stage._controls;
+  const oldTarget = ctr.target.clone();
+  const size = new THREE.Vector2(); r.getSize(size);
+  const oldPos = cam.position.clone(), oldAsp = cam.aspect, oldRot = ctr.autoRotate;
+  const oldDPR = r.getPixelRatio();
+  r.setPixelRatio(1);
+  ctr.autoRotate = false;
+  const oldBG = stage._scene.background;
+  stage._scene.background = new THREE.Color('#1d1714');
+  // enquadramento pela silhueta real: vértices da geometria em coordenadas de mundo
+  const box = new THREE.Box3().setFromObject(stage._object);
+  const ctro = box.getCenter(new THREE.Vector3());
+  const pts = vertices();
+  const fov = cam.fov * Math.PI / 180;
+  const tanV = Math.tan(fov / 2);
+  const tanH = tanV * (PX[0] / PX[1]);
+  const n = new THREE.Vector3(dir[0], dir[1], dir[2]).normalize();
+  const up0 = Math.abs(n.y) > 0.95 ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(0, 1, 0);
+  const right = new THREE.Vector3().crossVectors(up0, n).normalize();
+  const up = new THREE.Vector3().crossVectors(n, right).normalize();
+  if (roll) { right.applyAxisAngle(n, roll).normalize(); up.applyAxisAngle(n, roll).normalize(); }
+  let dist = 0;
+  const c = new THREE.Vector3();
+  for (let i = 0; i < pts.length; i += 3) {
+    c.set(pts[i], pts[i + 1], pts[i + 2]).sub(ctro);
+    const d = c.dot(n);
+    dist = Math.max(dist, Math.abs(c.dot(right)) / tanH + d, Math.abs(c.dot(up)) / tanV + d);
+  }
+  dist *= 1.06;
+  ctr.target.copy(ctro);
+  const v = n.clone().multiplyScalar(dist);
+  cam.position.copy(ctr.target).add(v);
+  cam.up.copy(up);
+  cam.lookAt(ctr.target);
+  cam.aspect = PX[0] / PX[1];
+  cam.updateProjectionMatrix();
+  r.setSize(PX[0], PX[1], false);
+  r.render(stage._scene, cam);
+  const data = r.domElement.toDataURL('image/jpeg', 0.94);
+  const dim = [r.domElement.width, r.domElement.height];
+  cam.position.copy(oldPos); cam.aspect = oldAsp; cam.up.set(0, 1, 0); cam.updateProjectionMatrix();
+  cam.lookAt(oldTarget);
+  stage._scene.background = oldBG;
+  r.setPixelRatio(oldDPR);
+  r.setSize(size.x, size.y, false);
+  ctr.target.copy(oldTarget);
+  ctr.autoRotate = oldRot;
+  stage.requestRender();
+  return { data: data, dim: dim };
+}
+
+// gerador de PDF mínimo: páginas A4 paisagem com JPEG embutido
+function montarPDF(imagens, dims, legendas) {
+  const W = 842, H = 595, enc = new TextEncoder();
+  const partes = [], offsets = [];
+  let out = [], len = 0;
+  const push = (bytes) => { out.push(bytes); len += bytes.length; };
+  const pushStr = (s) => push(enc.encode(s));
+  pushStr('%PDF-1.4\n');
+  const objs = [];
+  const addObj = (body, raw) => {
+    offsets.push(len);
+    pushStr((objs.length + 1) + ' 0 obj\n');
+    pushStr(body);
+    if (raw) { push(raw); pushStr('\nendstream\n'); }
+    pushStr('endobj\n');
+    objs.push(1);
+    return objs.length;
+  };
+  const n = imagens.length;
+  const kids = [];
+  const pagesId = 1 + 0; // reservado: montamos depois via placeholders
+  // objetos: 1 = Catalog, 2 = Pages, depois por página: Page, Content, Image; fonte no final
+  const pageIds = [], contentIds = [], imgIds = [];
+  for (let i = 0; i < n; i++) { pageIds.push(3 + i * 3); contentIds.push(4 + i * 3); imgIds.push(5 + i * 3); }
+  const fontId = 3 + n * 3;
+  addObj('<< /Type /Catalog /Pages 2 0 R >>\n');
+  addObj('<< /Type /Pages /Count ' + n + ' /Kids [' + pageIds.map(i => i + ' 0 R').join(' ') + '] >>\n');
+  for (let i = 0; i < n; i++) {
+    const m = 28, iw = W - m * 2, ih = ((H - m * 2 - 26) );
+    const [pw, ph] = dims[i];
+    const scale = Math.min(iw / pw, ih / ph);
+    const dw = pw * scale, dh = ph * scale;
+    const dx = (W - dw) / 2, dy = H - m - dh;
+    const stream = 'q ' + dw.toFixed(2) + ' 0 0 ' + dh.toFixed(2) + ' ' + dx.toFixed(2) + ' ' + dy.toFixed(2) +
+      ' cm /Im0 Do Q\nBT /F1 11 Tf ' + dx.toFixed(2) + ' ' + (dy - 18).toFixed(2) + ' Td (' +
+      legendas[i].replace(/[^\x20-\x7e]/g, '-').replace(/[()\\]/g, '') + ') Tj ET\n' +
+      // assinatura UP Co. (teal da marca) alinhada à direita, sob a imagem
+      '0.341 0.6 0.608 rg BT /F1 9 Tf ' + (dx + dw - 168).toFixed(2) + ' ' + (dy - 18).toFixed(2) + ' Td (by UP Co.  \\267  o s\\363cio que faltava) Tj ET\n';
+    addObj('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + W + ' ' + H + '] /Resources << /XObject << /Im0 ' +
+      imgIds[i] + ' 0 R >> /Font << /F1 ' + fontId + ' 0 R >> >> /Contents ' + contentIds[i] + ' 0 R >>\n');
+    addObj('<< /Length ' + enc.encode(stream).length + ' >>\nstream\n', enc.encode(stream));
+    const bin = imagens[i];
+    addObj('<< /Type /XObject /Subtype /Image /Width ' + pw + ' /Height ' + ph +
+      ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + bin.length + ' >>\nstream\n', bin);
+  }
+  addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\n');
+  const xref = len;
+  pushStr('xref\n0 ' + (objs.length + 1) + '\n0000000000 65535 f \n');
+  offsets.forEach(o => pushStr(String(o).padStart(10, '0') + ' 00000 n \n'));
+  pushStr('trailer\n<< /Size ' + (objs.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF');
+  let total = 0; out.forEach(b => total += b.length);
+  const buf = new Uint8Array(total); let p = 0;
+  out.forEach(b => { buf.set(b, p); p += b.length; });
+  return new Blob([buf], { type: 'application/pdf' });
+}
+
+function dataURLtoBytes(u) {
+  const bin = atob(u.split(',')[1]);
+  const a = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+  return a;
+}
+
+pdf.addEventListener('click', () => {
+  rot(pdf, 'Gerando…');
+  setTimeout(() => {
+    try {
+      const shots = CENAS.map(c => renderCena(c.dir, c.roll));
+      const blob = montarPDF(shots.map(s => dataURLtoBytes(s.data)), shots.map(s => s.dim),
+                             CENAS.map(c => (kitAtivo ? (kitAtivo.marca || MARCA_PADRAO) + ' ' + kitAtivo.nome : 'Mockup 3D') + ' - ' + c.nome));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'rotulo-mockup-4-cenarios.pdf';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch (e) {
+      aviso.textContent = 'Falha ao gerar o PDF: ' + e.message;
+    }
+    rot(pdf, 'Mockup (PDF)');
+  }, 30);
+});
+
+const sync = () => {
+  stage._controls && stage._controls.autoRotate ? rot(girar, 'Pausar', 'pause') : rot(girar, 'Girar', 'play');
+};
+girar.addEventListener('click', () => {
+  const c = stage._controls;
+  if (!c) return;
+  c.autoRotate = !c.autoRotate;
+  sync();
+});
+if (stage._controls) stage._controls.addEventListener('start', sync);
+sync();
+
+
+/* rótulo + ícone vazado dos botões do mosaico */
+function rot(btn, texto, icone) {
+  btn.querySelector('.tx').textContent = texto;
+  if (icone) btn.querySelector('use').setAttribute('href', '#i-' + icone);
+}
+
+/* ---------- painel retrátil no celular ---------- */
+const up = document.getElementById('up');
+if (window.matchMedia('(max-width: 760px) and (orientation: portrait)').matches) up.classList.add('recolhido');
+/* ---------- pote sempre centralizado na área livre (sem painel por cima) ---------- */
+const mqRetrato = matchMedia('(max-width:760px) and (orientation:portrait)');
+const mqPaisagem = matchMedia('(max-height:500px) and (orientation:landscape)');
+
+/* rótulo da alça acompanha o estado: "Mais opções" (recolhido) / "Recolher" (aberto); teclado também abre e fecha */
+(function () {
+  const txt = toggleUp.querySelector('.txt');
+  const sync = () => {
+    const fechado = up.classList.contains('recolhido');
+    txt.textContent = fechado ? 'Mais opções' : 'Recolher';
+    toggleUp.setAttribute('aria-expanded', String(!fechado));
+  };
+  new MutationObserver(sync).observe(up, { attributes: true, attributeFilter: ['class'] });
+  sync();
+  toggleUp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); up.classList.toggle('recolhido'); }
+  });
+})();
+
+/* ---------- alça: toque alterna; puxar/arrastar redimensiona e encaixa ---------- */
+(function () {
+  let d = null;
+  const limites = () => {
+    const had = up.classList.contains('recolhido');
+    up.style.transition = 'none'; up.style.maxHeight = '';
+    up.classList.add('recolhido'); const lo = parseFloat(getComputedStyle(up).maxHeight);
+    up.classList.remove('recolhido'); const hi = Math.min(parseFloat(getComputedStyle(up).maxHeight), Math.max(up.scrollHeight, lo));
+    up.classList.toggle('recolhido', had); up.style.transition = '';
+    return [lo, hi];
+  };
+  toggleUp.addEventListener('pointerdown', e => {
+    if (!mqRetrato.matches) return;
+    const h0 = up.getBoundingClientRect().height, [lo, hi] = limites();
+    d = { id: e.pointerId, y0: e.clientY, h0, lo, hi, h: h0, moved: false, t: performance.now(), y: e.clientY, v: 0 };
+    toggleUp.setPointerCapture(e.pointerId);
+  });
+  toggleUp.addEventListener('pointermove', e => {
+    if (!d || e.pointerId !== d.id) return;
+    if (!d.moved) {
+      if (Math.abs(e.clientY - d.y0) < 6) return;
+      d.moved = true; up.classList.add('arrastando'); up.classList.remove('recolhido');
+    }
+    const now = performance.now();
+    d.v = (d.y - e.clientY) / Math.max(1, now - d.t); d.t = now; d.y = e.clientY;   // px/ms, positivo = subindo
+    d.h = Math.min(d.hi, Math.max(d.lo, d.h0 + d.y0 - e.clientY));
+    up.style.maxHeight = d.h + 'px';
+  });
+  const fim = e => {
+    if (!d || e.pointerId !== d.id) return;
+    const s = d; d = null;
+    if (!s.moved) { up.classList.toggle('recolhido'); return; }
+    const abrir = Math.abs(s.v) > 0.4 ? s.v > 0 : s.h > (s.lo + s.hi) / 2;
+    up.style.maxHeight = s.h + 'px'; up.classList.remove('arrastando');
+    void up.offsetHeight;                       // fixa a altura atual para a transição partir daqui
+    up.classList.toggle('recolhido', !abrir);
+    up.style.maxHeight = '';
+  };
+  toggleUp.addEventListener('pointerup', fim);
+  toggleUp.addEventListener('pointercancel', fim);
+})();
+
+const stageEl = document.querySelector('three-d-stage');
+const STAGE_PROPS = ['position', 'left', 'right', 'top', 'bottom', 'width', 'height'];
+function ajustaStage() {
+  const r = document.getElementById('up').getBoundingClientRect();
+  let v = null;
+  if (mqRetrato.matches) v = { position: 'fixed', left: '0', right: '0', top: '0', width: 'auto', height: 'auto', bottom: Math.max(0, innerHeight - r.top) + 'px' };
+  else if (mqPaisagem.matches) v = { position: 'fixed', top: '0', bottom: '0', right: '0', width: 'auto', height: 'auto', left: Math.max(0, r.right) + 'px' };
+  STAGE_PROPS.forEach(p => v ? stageEl.style.setProperty(p, v[p]) : stageEl.style.removeProperty(p));
+}
+new ResizeObserver(ajustaStage).observe(document.getElementById('up'));
+['resize', 'orientationchange'].forEach(e => addEventListener(e, ajustaStage));
+mqRetrato.addEventListener('change', e => { if (e.matches) document.getElementById('up').classList.add('recolhido'); ajustaStage(); });
+mqPaisagem.addEventListener('change', ajustaStage);
+ajustaStage();
+
+
+/* ---------- biblioteca de artes ---------- */
+const DB = 'rotulo-biblioteca';
+function idb() {
+  return new Promise((ok, err) => {
+    const r = indexedDB.open(DB, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('artes', { keyPath: 'id' });
+    r.onsuccess = () => ok(r.result);
+    r.onerror = () => err(r.error);
+  });
+}
+function tx(modo, fn) {
+  return idb().then(db => new Promise((ok, err) => {
+    const t = db.transaction('artes', modo), s = t.objectStore('artes');
+    const req = fn(s);
+    t.oncomplete = () => ok(req && req.result);
+    t.onerror = () => err(t.error);
+  }));
+}
+const embutida = document.getElementById('bibliotecaEmbutida');
+const modoCliente = !!embutida;
+let artes = embutida ? JSON.parse(embutida.textContent).artes : [];
+const MARCA_PADRAO = 'Veleiros do Caribe';
+// id do kit atualmente aplicado no pote — tenta recuperar da sessão anterior
+// comparando com o que foi salvo (senão fica sem nenhum card marcado)
+let kitAtivoId = store.kitAtivoId || null;
+let marcaAtual = 'Todas';   // definida na primeira tela (escolha da marca)
+
+function pintarMarcas() {
+  const marcas = [...new Set(artes.map(a => a.marca || MARCA_PADRAO))];
+  gabaritos.style.display = /veleiros|rota/i.test(marcaAtual) ? '' : 'none';   // gabaritos são do pote padrão Veleiros
+  if (marcas.length < 2 || marcaAtual === 'Todas') { marcasBar.style.display = 'none'; marcasBar.innerHTML = ''; return; }
+  marcasBar.style.display = '';
+  marcasBar.innerHTML = '<span class="b on">' + marcaAtual + '</span><span class="b trocar" role="button" tabindex="0">⇄ Trocar marca</span>';
+  marcasBar.querySelector('.trocar').addEventListener('click', abrirEscolha);
+}
+
+/* ---------- primeira tela: escolha da marca ----------
+   Link direto para uma marca: index.html?marca=jack-fera (pula a escolha). */
+const slugMarca = m => m.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const EXTRAS_MARCA = [];
+function abrirEscolha() {
+  const marcas = [...new Set(artes.filter(a => a.servidor).map(a => a.marca || MARCA_PADRAO))];
+  if (!marcas.length) return;
+  emGrade.innerHTML = '';
+  marcas.forEach(m => {
+    const kits = artes.filter(a => (a.marca || MARCA_PADRAO) === m && a.tipo === 'kit');
+    const b = document.createElement('button');
+    b.className = 'em-marca'; b.type = 'button';
+    b.innerHTML = '<img alt=""><b></b><span></span>';
+    b.querySelector('img').src = kits[0] ? (kits[0].thumb || kits[0].dataTop) : '';
+    b.querySelector('b').textContent = m;
+    b.querySelector('span').textContent = kits.length + (kits.length === 1 ? ' modelo' : ' modelos');
+    b.addEventListener('click', () => escolherMarca(m));
+    emGrade.appendChild(b);
+  });
+  EXTRAS_MARCA.forEach(x => {
+    const a = document.createElement('a');
+    a.className = 'em-marca'; a.href = x.href;
+    a.innerHTML = '<img alt="" class="' + (x.frasco ? 'frasco' : '') + '" src="' + x.thumb + '"><b>' + x.nome + '</b><span>' + x.sub + '</span>';
+    emGrade.appendChild(a);
+  });
+  escolhaMarca.hidden = false;
+  const p = emGrade.querySelector('.em-marca'); if (p) p.focus();
+}
+function escolherMarca(m) {
+  marcaAtual = m; store.marcaAtual = m;
+  try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {}
+  escolhaMarca.hidden = true;
+  document.title = m + ' — simulador 3D';
+  pintarLib();
+  // abre o kit que já estava aplicado (se for desta marca) ou o primeiro da marca
+  const kitPedido = new URLSearchParams(location.search).get('kit');
+  const k = (kitPedido && lib.querySelector('figure[data-kit="srv-' + kitPedido + '"]')) || lib.querySelector('figure.ativo') || lib.querySelector('figure');
+  if (k) k.click();
+}
+function iniciarMarca() {
+  const pedida = new URLSearchParams(location.search).get('marca');
+  const marcas = [...new Set(artes.map(a => a.marca || MARCA_PADRAO))];
+  const achada = pedida && marcas.find(m => slugMarca(m) === slugMarca(pedida));
+  if (achada) escolherMarca(achada); else abrirEscolha();
+}
+
+/* ---------- ao escolher um modelo com a barra aberta (celular em pé):
+   a barra recolhe devagar e o pote gira até a vista ampla padrão, já com a arte nova ---------- */
+function mostrarResultado() {
+  if (!mqRetrato.matches || up.classList.contains('recolhido')) return;   // barra recolhida: só aplica, sem animação
+  // recolhido esconde os blocos de baixo na hora; por isso anima a altura antes e só então aplica a classe
+  const cs = getComputedStyle(up);
+  const extra = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);   // max-height vale para o conteúdo
+  const h0 = up.getBoundingClientRect().height - extra;
+  up.style.transition = 'none'; up.classList.add('recolhido');
+  const h1 = up.getBoundingClientRect().height - extra;       // altura final (barra recolhida)
+  up.classList.remove('recolhido');
+  up.style.maxHeight = h0 + 'px'; up.style.overflow = 'hidden';
+  void up.offsetHeight;
+  up.style.transition = 'max-height .85s cubic-bezier(.4,0,.2,1)';
+  up.style.maxHeight = h1 + 'px';
+  setTimeout(() => {
+    up.classList.add('recolhido');
+    up.style.transition = 'none'; up.style.maxHeight = ''; up.style.overflow = '';
+    void up.offsetHeight; up.style.transition = '';
+  }, 880);
+  girarAteVistaPadrao(1700);
+}
+function girarAteVistaPadrao(dur) {
+  const cam = stage._camera, ctr = stage._controls;
+  if (!cam || !ctr || !stage._object) return;
+  const sphere = new THREE.Box3().setFromObject(stage._object).getBoundingSphere(new THREE.Sphere());
+  const dist = sphere.radius / Math.tan(cam.fov * Math.PI / 360) * 1.35;      // mesmo enquadramento do stage
+  const alvoDir = new THREE.Vector3(1, 0.55, 1.25).normalize();
+  const t0 = ctr.target.clone(), t1 = sphere.center.clone();
+  const o0 = cam.position.clone().sub(t0);
+  const r0 = o0.length(), r1 = dist;
+  const az0 = Math.atan2(o0.x, o0.z), el0 = Math.asin(THREE.MathUtils.clamp(o0.y / r0, -1, 1));
+  const azAlvo = Math.atan2(alvoDir.x, alvoDir.z), el1 = Math.asin(alvoDir.y);
+  let dAz = ((azAlvo - az0) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);   // sempre no mesmo sentido…
+  dAz += 2 * Math.PI;                                                          // …com uma volta completa
+  const giravaSozinho = ctr.autoRotate; ctr.autoRotate = false;
+  const ini = performance.now();
+  const passo = agora => {
+    const k = Math.min(1, (agora - ini) / dur), e = easeInOutCubic(k);
+    const az = az0 + dAz * e, el = el0 + (el1 - el0) * e, r = r0 + (r1 - r0) * e;
+    ctr.target.lerpVectors(t0, t1, e);
+    cam.position.set(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).multiplyScalar(r).add(ctr.target);
+    cam.lookAt(ctr.target); ctr.update(); stage.requestRender();
+    if (k < 1) requestAnimationFrame(passo); else ctr.autoRotate = giravaSozinho;
+  };
+  requestAnimationFrame(passo);
+}
+
+/* ---------- PDF de impressão (tampa + tarja) do modelo escolhido ---------- */
+let kitAtivo = null;
+const nomeArquivoPdf = a => a.pdf.split('/').pop();   // ex.: fildercut-evoluxion-dourado-inclinada.pdf
+function atualizaBaixarArte() {
+  baixarArte.hidden = !(kitAtivo && kitAtivo.pdf);
+  if (!baixarArte.hidden) baixarArte.title = 'Baixar o PDF de impressão (tampa + tarja): ' + kitAtivo.nome;
+  baixarAi.hidden = !(kitAtivo && kitAtivo.ai);
+  if (!baixarAi.hidden) baixarAi.title = 'Baixar os arquivos editáveis (Illustrator): ' + kitAtivo.nome;
+}
+/* download direto na tela do app: baixa o arquivo como blob "genérico" e salva com o nome certo.
+   Um link comum para .pdf faz o celular/navegador abrir o visualizador numa página nova. */
+async function baixarArquivo(url, nome) {
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error(r.status);
+    const blob = new Blob([await r.arrayBuffer()], { type: 'application/octet-stream' });
+    const u = URL.createObjectURL(blob);
+    const el = document.createElement('a');
+    el.href = u; el.download = nome;
+    document.body.appendChild(el); el.click(); el.remove();
+    setTimeout(() => URL.revokeObjectURL(u), 15000);
+  } catch (e) {
+    aviso.textContent = 'Não consegui baixar o arquivo agora. Tente de novo.';
+  }
+}
+baixarArte.addEventListener('click', async () => {
+  if (!kitAtivo || !kitAtivo.pdf || baixarArte.disabled) return;
+  baixarArte.disabled = true; rot(baixarArte, 'Baixando…');
+  await baixarArquivo(kitAtivo.pdf, nomeArquivoPdf(kitAtivo));
+  baixarArte.disabled = false; rot(baixarArte, 'Arte (PDF)');
+});
+baixarAi.addEventListener('click', async () => {
+  if (!kitAtivo || !kitAtivo.ai || baixarAi.disabled) return;
+  baixarAi.disabled = true; rot(baixarAi, 'Baixando…');
+  await baixarArquivo(kitAtivo.ai, kitAtivo.ai.split('/').pop());
+  baixarAi.disabled = false; rot(baixarAi, 'Arte (AI)');
+});
+
+function pintarLib() {
+  pintarMarcas();
+  lib.innerHTML = '';
+  const visiveis = marcaAtual === 'Todas' ? artes : artes.filter(a => (a.marca || MARCA_PADRAO) === marcaAtual);
+  visiveis.forEach(a => {
+    const ehKit = a.tipo === 'kit';
+    const f = document.createElement('figure'); f.dataset.kit = a.id;
+    if (ehKit && a.id === kitAtivoId) f.classList.add('ativo');
+    f.title = a.nome + (a.selo ? ' (' + a.selo + ')' : '') + (ehKit ? ' — clique para aplicar tampa + tarja juntas' : ' — clique para aplicar');
+    f.innerHTML = '<img alt="">' +
+      (ehKit ? (a.id === kitAtivoId ? '<span class="check">✓</span>' : '') :
+        '<span class="tag">' + (a.slot === 'top' ? 'TAMPA' : 'TARJA') + '</span>') +
+      '<div class="act"><span data-a="dl" title="Baixar">↓</span>' +
+      (modoCliente || a.servidor ? '' : '<span data-a="rm" title="Remover">×</span>') + '</div>' +
+      (a.selo ? '<span class="selo">' + a.selo + '</span>' : '') +
+      (a.semNome ? '' : '<figcaption>' + a.nome + '</figcaption>');   // semNome: cartão só com a imagem
+    const im = f.querySelector('img');
+    im.onload = () => {
+      if (ehKit) return; // resolução checada nos dois arquivos do kit, não no preview
+      const min = a.slot === 'wrap' ? 4096 : 1400;
+      if (im.naturalWidth < min) {
+        const t = f.querySelector('.tag');
+        t.textContent += ' · BAIXA RES';
+        t.style.background = '#ef6a60';
+        f.title = a.nome + ' — ' + im.naturalWidth + ' px de largura: substitua por uma versão maior';
+      }
+    };
+    im.src = ehKit ? (a.thumb || a.dataTop) : a.data;
+    f.addEventListener('click', e => {
+      const act = e.target.dataset && e.target.dataset.a;
+      if (act === 'dl') {
+        e.stopPropagation();
+        const baixarUm = (url, nome) => {
+          const ext = (url.match(/^data:image\/(\w+)/) || url.match(/\.(\w+)(?:\?|$)/) || [, ''])[1];
+          baixarArquivo(url, ext && !nome.endsWith('.' + ext) ? nome + '.' + ext : nome);
+        };
+        if (ehKit && a.pdf) {
+          baixarUm(a.pdf, nomeArquivoPdf(a));
+        } else if (ehKit) {
+          baixarUm(a.fullTop || a.dataTop, a.nome + ' - tampa');
+          setTimeout(() => baixarUm(a.fullWrap || a.dataWrap, a.nome + ' - tarja'), 250);
+        } else {
+          baixarUm(a.data, a.nome);
+        }
+        return;
+      }
+      if (act === 'rm') {
+        e.stopPropagation();
+        artes = artes.filter(x => x.id !== a.id);
+        tx('readwrite', s => s.delete(a.id)).catch(() => {});
+        pintarLib();
+        return;
+      }
+      if (ehKit) {
+        aplicaGeo({ alt: a.alt, tampa: a.tampaMm, foco: a.foco, pote: a.pote, corPasta: a.corPasta, acabamento: a.acabamento });
+        if (a.dataTop) applyArt('top', a.dataTop);
+        jar.getObjectByName('rotulo_tampa').visible = !!a.dataTop;   // kit sem arte de tampa: tampa lisa
+        const urlTarja = (MAXTEX > 4096 && a.dataWrapHd) || a.dataWrap;
+        applyArt('wrap', urlTarja);
+        store.top = a.dataTop; store.wrap = urlTarja;
+        kitAtivoId = a.id; store.kitAtivoId = a.id;
+        kitAtivo = a; atualizaBaixarArte();
+        if (e.isTrusted) mostrarResultado();   // escolha feita pela pessoa (não a automática da abertura)
+      } else {
+        applyArt(a.slot, a.data);
+        store[a.slot] = a.data;
+        kitAtivoId = null; store.kitAtivoId = null;
+        kitAtivo = null; atualizaBaixarArte();
+      }
+      try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (err) {}
+      pintarLib();
+    });
+    lib.appendChild(f);
+  });
+  vazioLib.style.display = artes.length ? 'none' : '';
+}
+
+function reduzir(dataURL, max) {
+  return new Promise(ok => {
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, max / Math.max(im.width, im.height));
+      if (k === 1) return ok({ data: dataURL, w: im.width, h: im.height });
+      const [c, x] = cv(Math.round(im.width * k), Math.round(im.height * k));
+      x.drawImage(im, 0, 0, c.width, c.height);
+      ok({ data: c.toDataURL('image/png'), w: im.width, h: im.height });
+    };
+    im.src = dataURL;
+  });
+}
+
+async function addArte(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const dataURL = await new Promise(ok => {
+    const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.readAsDataURL(file);
+  });
+  const r = await reduzir(dataURL, 8192);
+  const arte = {
+    id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+    nome: file.name,
+    tipo: 'single',
+    slot: r.w / r.h > 4 ? 'wrap' : 'top',   // faixa larga = tarja, resto = tampa
+    data: r.data
+  };
+  artes.push(arte);
+  try { await tx('readwrite', s => s.put(arte)); aviso.textContent = ''; }
+  catch (e) { aviso.textContent = 'Nao foi possivel salvar a biblioteca neste navegador.'; }
+  pintarLib();
+}
+
+fileLib.addEventListener('change', async e => {
+  for (const f of e.target.files) await addArte(f);
+  e.target.value = '';
+});
+['dragenter', 'dragover'].forEach(ev => dropLib.addEventListener(ev, e => {
+  e.preventDefault(); dropLib.classList.add('over');
+}));
+['dragleave', 'drop'].forEach(ev => dropLib.addEventListener(ev, e => {
+  e.preventDefault(); dropLib.classList.remove('over');
+}));
+dropLib.addEventListener('drop', async e => {
+  for (const f of e.dataTransfer.files) await addArte(f);
+});
+
+/* artes hospedadas na pasta artes/ do servidor */
+function carregaImg(url) {
+  return new Promise(ok => {
+    const im = new Image();
+    im.onload = () => ok(true);
+    im.onerror = () => ok(false);
+    im.src = url;
+  });
+}
+async function carregarPasta() {
+  const achadas = [];
+  // 1) manifesto de kits (tampa + tarja pareadas): { id, nome, tampa, tarja }
+  try {
+    const r = await fetch('artes/artes.json', { cache: 'no-store' });
+    if (r.ok) {
+      const lista = await r.json();
+      if (Array.isArray(lista) && lista.length && lista[0] && lista[0].tampa) {
+        lista.forEach((c, i) => achadas.push({
+          id: 'srv-' + (c.id || i), servidor: true, tipo: 'kit',
+          nome: c.nome || ('Kit ' + (i + 1)),
+          // nome da marca — permite mais de uma marca na mesma biblioteca,
+          // com um filtro na UI pra navegar entre elas (ver artes.json)
+          marca: c.marca || MARCA_PADRAO,
+          // miniatura leve pra galeria (não baixa nada em resolução alta à toa)
+          thumb: 'artes/' + (c.thumb || c.tampa),
+          semTampa: !c.tampa,
+          // versão "display" (tamanho real de uso na textura 3D: 2048² / 4096
+          // de largura) — é isso que baixa ao trocar de kit, bem mais leve que
+          // o arquivo mestre. Se não existir em artes/display/, cai pro arquivo
+          // original (compatibilidade com kits enviados por FTP sem essa pasta).
+          dataTop: c.tampa ? 'artes/' + c.tampa : null,
+          dataWrap: 'artes/' + c.tarja,
+          // tarja em alta (~8000 px) para telas/GPUs que aguentam textura de 8192: fica tão nítida quanto a tampa de perto
+          dataWrapHd: c.tarjaHd ? 'artes/' + c.tarjaHd : null,
+          // arquivo mestre em resolução real — só usado no botão de download
+          fullTop: c.tampa ? 'artes/' + c.tampa : null,
+          alt: c.alt, tampaMm: c.tampaMm, foco: c.foco, pote: c.pote, corPasta: c.corPasta,
+          pdf: c.pdf ? 'artes/' + c.pdf : null, ai: c.ai ? 'artes/' + c.ai : null, selo: c.selo || null, semNome: !!c.semNome, acabamento: c.acabamento || null,
+          fullWrap: 'artes/' + c.tarja
+        }));
+        return achadas;
+      }
+      // formato antigo (compatibilidade): lista plana com slot avulso
+      lista.forEach((a, i) => achadas.push({
+        id: 'srv-' + i, servidor: true, tipo: 'single',
+        nome: a.nome || a.arquivo,
+        slot: a.slot === 'wrap' || /tarja|corpo/i.test(a.arquivo) ? 'wrap' : 'top',
+        data: 'artes/' + a.arquivo
+      }));
+      return achadas;
+    }
+  } catch (e) { /* sem manifesto: cai na convenção de nomes */ }
+  // 2) convenção tampa-01 / tarja-01: mesma numeração = mesmo kit
+  const exts = ['png', 'jpg', 'jpeg', 'webp'];
+  const achaUrl = async (base) => {
+    for (const e of exts) {
+      const url = 'artes/' + base + '.' + e;
+      if (await carregaImg(url)) return url;
+    }
+    return null;
+  };
+  const achaDisplay = async (base, full) => {
+    for (const e of exts) {
+      const url = 'artes/' + base + '.' + e;
+      if (await carregaImg(url)) return url;
+    }
+    return full; // sem versão display/: usa o arquivo cheio mesmo (mais lento, mas funciona)
+  };
+  let falhas = 0;
+  for (let n = 1; n <= 60 && falhas < 3; n++) {
+    const num = String(n).padStart(2, '0');
+    const [top, wrap] = await Promise.all([achaUrl('tampa-' + num), achaUrl('tarja-' + num)]);
+    if (top || wrap) {
+      falhas = 0;
+      if (top && wrap) {
+        const [dispTop, dispWrap] = await Promise.all([achaDisplay('tampa-' + num, top), achaDisplay('tarja-' + num, wrap)]);
+        achadas.push({ id: 'srv-' + num, servidor: true, tipo: 'kit', nome: 'Kit ' + num, thumb: top, dataTop: dispTop, dataWrap: dispWrap, fullTop: top, fullWrap: wrap });
+      } else if (top) {
+        achadas.push({ id: 'srv-top-' + num, servidor: true, tipo: 'single', nome: 'tampa-' + num, slot: 'top', data: top });
+      } else {
+        achadas.push({ id: 'srv-wrap-' + num, servidor: true, tipo: 'single', nome: 'tarja-' + num, slot: 'wrap', data: wrap });
+      }
+    } else falhas++;
+  }
+  return achadas;
+}
+
+if (modoCliente) {
+  dropLib.style.display = 'none';
+  exportar.style.display = 'none';
+  ajudaLib.textContent = 'Clique numa arte para ver no pote, ou baixe pelo icone.';
+  pintarLib();
+  carregarPasta().then(srv => {
+    if (srv.length) { artes = srv.concat(artes); pintarLib(); }
+    iniciarMarca();
+  });
+} else {
+  Promise.all([
+    tx('readonly', s => s.getAll()).catch(() => []),
+    carregarPasta()
+  ]).then(([locais, srv]) => {
+    artes = srv.concat(locais || []);
+    pintarLib();
+    iniciarMarca();
+  });
+}
+
+exportar.addEventListener('click', async () => {
+  rot(exportar, 'Gerando…');
+  let motor = '';
+  try { motor = await (await fetch('three-d-stage.js')).text(); }
+  catch (e) {
+    aviso.textContent = 'Nao consegui ler three-d-stage.js para embutir.';
+    rot(exportar, 'Exportar HTML');
+    return;
+  }
+  setTimeout(() => {
+    const srcs = [prevTop.src, prevWrap.src];
+    const thumbs = Array.from(lib.childNodes);
+    prevTop.removeAttribute('src'); prevWrap.removeAttribute('src');
+    lib.replaceChildren();
+    const antigo = document.getElementById('bibliotecaEmbutida');
+    if (antigo) antigo.remove();
+    const tag = document.createElement('script');
+    tag.type = 'application/json';
+    tag.id = 'bibliotecaEmbutida';
+    tag.textContent = JSON.stringify({ artes: artes.filter(a => !a.servidor) });
+    document.body.appendChild(tag);
+    let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    tag.remove();
+    lib.append(...thumbs);
+    if (srcs[0]) prevTop.src = srcs[0];
+    if (srcs[1]) prevWrap.src = srcs[1];
+    // embute o motor 3D para o arquivo funcionar sozinho
+    html = html.replace('<scr' + 'ipt src="three-d-stage.js"></scr' + 'ipt>',
+      '<scr' + 'ipt>' + motor.split('<' + '/script').join('<\\/script') + '</scr' + 'ipt>');
+    const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = 'simulador-rotulo-cliente.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    rot(exportar, 'Exportar HTML');
+  }, 30);
+});
+
+/* ---------- cor do pote e da tampa (plástico; a arte dos rótulos não muda) ---------- */
+const COR_ORIG = new Map([...MAT_ORIGINAL.values()].map(m => [m, m.color.clone()]));
+const pintaPecas = (pecas, cor) => { new Set(pecas.map(n => jar.getObjectByName(n).material)).forEach(m => m.color.set(cor)); stage.requestRender(); };
+corPote.addEventListener('input', () => pintaPecas(PECAS_POTE, corPote.value));
+corTampaPlastico.addEventListener('input', () => pintaPecas(PECAS_TAMPA, corTampaPlastico.value));
+
+reset.addEventListener('click', () => {
+  Object.entries(slots).forEach(([which, s]) => {
+    s.mat.map = s.base; s.mat.needsUpdate = true;
+    s.prev.removeAttribute('src'); s.drop.classList.remove('has');
+    delete store[which];
+  });
+  COR_ORIG.forEach((c, m) => m.color.copy(c));
+  Object.values(pinturas).forEach(m => m.dispose()); for (const k in pinturas) delete pinturas[k];
+  jar.getObjectByName('rotulo_tampa').visible = true;
+  aplicaGeo(null); delete store.kitAtivoId; kitAtivoId = null; kitAtivo = null; atualizaBaixarArte(); pintarLib();
+  corPote.value = corTampaPlastico.value = '#0f0e0f';
+  stage.requestRender();
+  localStorage.setItem(KEY, JSON.stringify(store));
+});
+</script>
+</body>
+</html>

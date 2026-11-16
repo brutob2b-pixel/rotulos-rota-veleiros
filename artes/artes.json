@@ -1,0 +1,983 @@
+[
+ {
+  "id": "site-black-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Black Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-black-dourado-tampa.webp",
+  "tarja": "../img/site-black-dourado-tarja.webp",
+  "tarjaHd": "../img/site-black-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-black-dourado.webp"
+ },
+ {
+  "id": "site-black-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Black Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-black-prata-tampa.webp",
+  "tarja": "../img/site-black-prata-tarja.webp",
+  "tarjaHd": "../img/site-black-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-black-prata.webp"
+ },
+ {
+  "id": "site-classic-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Classic Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-classic-dourado-tampa.webp",
+  "tarja": "../img/site-classic-dourado-tarja.webp",
+  "tarjaHd": "../img/site-classic-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-classic-dourado.webp"
+ },
+ {
+  "id": "site-classic-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Classic Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-classic-prata-tampa.webp",
+  "tarja": "../img/site-classic-prata-tarja.webp",
+  "tarjaHd": "../img/site-classic-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-classic-prata.webp"
+ },
+ {
+  "id": "site-light-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Light Dourada · Site publicado (Veleiros)",
+  "tampa": "../img/site-light-dourado-tampa.webp",
+  "tarja": "../img/site-light-dourado-tarja.webp",
+  "tarjaHd": "../img/site-light-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-light-dourado.webp"
+ },
+ {
+  "id": "site-light-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Light Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-light-prata-tampa.webp",
+  "tarja": "../img/site-light-prata-tarja.webp",
+  "tarjaHd": "../img/site-light-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-light-prata.webp"
+ },
+ {
+  "id": "site-premium-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Premium Dourada · Site publicado (Veleiros)",
+  "tampa": "../img/site-premium-dourado-tampa.webp",
+  "tarja": "../img/site-premium-dourado-tarja.webp",
+  "tarjaHd": "../img/site-premium-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-premium-dourado.webp"
+ },
+ {
+  "id": "site-premium-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Premium Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-premium-prata-tampa.webp",
+  "tarja": "../img/site-premium-prata-tarja.webp",
+  "tarjaHd": "../img/site-premium-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-premium-prata.webp"
+ },
+ {
+  "id": "site-morango-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Morango Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-morango-prata-tampa.webp",
+  "tarja": "../img/site-morango-prata-tarja.webp",
+  "tarjaHd": "../img/site-morango-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-morango-prata.webp"
+ },
+ {
+  "id": "site-morango-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Morango Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-morango-dourado-tampa.webp",
+  "tarja": "../img/site-morango-dourado-tarja.webp",
+  "tarjaHd": "../img/site-morango-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-morango-dourado.webp"
+ },
+ {
+  "id": "site-pistache-claro-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Pistache Claro Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-pistache-claro-dourado-tampa.webp",
+  "tarja": "../img/site-pistache-claro-dourado-tarja.webp",
+  "tarjaHd": "../img/site-pistache-claro-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-pistache-claro-dourado.webp"
+ },
+ {
+  "id": "site-pistache-claro-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Pistache Claro Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-pistache-claro-prata-tampa.webp",
+  "tarja": "../img/site-pistache-claro-prata-tarja.webp",
+  "tarjaHd": "../img/site-pistache-claro-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-pistache-claro-prata.webp"
+ },
+ {
+  "id": "site-pistache-veleiro-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Pistache Veleiro Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-pistache-veleiro-dourado-tampa.webp",
+  "tarja": "../img/site-pistache-veleiro-dourado-tarja.webp",
+  "tarjaHd": "../img/site-pistache-veleiro-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-pistache-veleiro-dourado.webp"
+ },
+ {
+  "id": "site-pistache-veleiro-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Pistache Veleiro Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-pistache-veleiro-prata-tampa.webp",
+  "tarja": "../img/site-pistache-veleiro-prata-tarja.webp",
+  "tarjaHd": "../img/site-pistache-veleiro-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-pistache-veleiro-prata.webp"
+ },
+ {
+  "id": "site-pistache-oliva-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Pistache Oliva Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-pistache-oliva-dourado-tampa.webp",
+  "tarja": "../img/site-pistache-oliva-dourado-tarja.webp",
+  "tarjaHd": "../img/site-pistache-oliva-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-pistache-oliva-dourado.webp"
+ },
+ {
+  "id": "site-pistache-oliva-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Pistache Oliva Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-pistache-oliva-prata-tampa.webp",
+  "tarja": "../img/site-pistache-oliva-prata-tarja.webp",
+  "tarjaHd": "../img/site-pistache-oliva-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-pistache-oliva-prata.webp"
+ },
+ {
+  "id": "site-classic-cinza-navio-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Classic Cinza Navio Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-classic-cinza-navio-dourado-tampa.webp",
+  "tarja": "../img/site-classic-cinza-navio-dourado-tarja.webp",
+  "tarjaHd": "../img/site-classic-cinza-navio-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-classic-cinza-navio-dourado.webp"
+ },
+ {
+  "id": "site-classic-cinza-navio-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Classic Cinza Navio Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-classic-cinza-navio-prata-tampa.webp",
+  "tarja": "../img/site-classic-cinza-navio-prata-tarja.webp",
+  "tarjaHd": "../img/site-classic-cinza-navio-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-classic-cinza-navio-prata.webp"
+ },
+ {
+  "id": "site-classic-cinza-liso-dourado",
+  "marca": "Veleiros do Caribe",
+  "nome": "Classic Cinza Liso Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-classic-cinza-liso-dourado-tampa.webp",
+  "tarja": "../img/site-classic-cinza-liso-dourado-tarja.webp",
+  "tarjaHd": "../img/site-classic-cinza-liso-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-classic-cinza-liso-dourado.webp"
+ },
+ {
+  "id": "site-classic-cinza-liso-prata",
+  "marca": "Veleiros do Caribe",
+  "nome": "Classic Cinza Liso Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-classic-cinza-liso-prata-tampa.webp",
+  "tarja": "../img/site-classic-cinza-liso-prata-tarja.webp",
+  "tarjaHd": "../img/site-classic-cinza-liso-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-classic-cinza-liso-prata.webp"
+ },
+ {
+  "id": "site-rota-black-dourado",
+  "marca": "Rota do Caribe",
+  "nome": "Black Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-black-dourado-tampa.webp",
+  "tarja": "../img/site-rota-black-dourado-tarja.webp",
+  "tarjaHd": "../img/site-rota-black-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-black-dourado.webp"
+ },
+ {
+  "id": "site-rota-black-prata",
+  "marca": "Rota do Caribe",
+  "nome": "Black Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-black-prata-tampa.webp",
+  "tarja": "../img/site-rota-black-prata-tarja.webp",
+  "tarjaHd": "../img/site-rota-black-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-black-prata.webp"
+ },
+ {
+  "id": "site-rota-classic-dourado",
+  "marca": "Rota do Caribe",
+  "nome": "Classic Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-classic-dourado-tampa.webp",
+  "tarja": "../img/site-rota-classic-dourado-tarja.webp",
+  "tarjaHd": "../img/site-rota-classic-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-classic-dourado.webp"
+ },
+ {
+  "id": "site-rota-classic-prata",
+  "marca": "Rota do Caribe",
+  "nome": "Classic Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-classic-prata-tampa.webp",
+  "tarja": "../img/site-rota-classic-prata-tarja.webp",
+  "tarjaHd": "../img/site-rota-classic-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-classic-prata.webp"
+ },
+ {
+  "id": "site-rota-light-dourado",
+  "marca": "Rota do Caribe",
+  "nome": "Light Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-light-dourado-tampa.webp",
+  "tarja": "../img/site-rota-light-dourado-tarja.webp",
+  "tarjaHd": "../img/site-rota-light-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-light-dourado.webp"
+ },
+ {
+  "id": "site-rota-light-prata",
+  "marca": "Rota do Caribe",
+  "nome": "Light Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-light-prata-tampa.webp",
+  "tarja": "../img/site-rota-light-prata-tarja.webp",
+  "tarjaHd": "../img/site-rota-light-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-light-prata.webp"
+ },
+ {
+  "id": "site-rota-premium-dourado",
+  "marca": "Rota do Caribe",
+  "nome": "Premium Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-premium-dourado-tampa.webp",
+  "tarja": "../img/site-rota-premium-dourado-tarja.webp",
+  "tarjaHd": "../img/site-rota-premium-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-premium-dourado.webp"
+ },
+ {
+  "id": "site-rota-premium-prata",
+  "marca": "Rota do Caribe",
+  "nome": "Premium Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-premium-prata-tampa.webp",
+  "tarja": "../img/site-rota-premium-prata-tarja.webp",
+  "tarjaHd": "../img/site-rota-premium-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-premium-prata.webp"
+ },
+ {
+  "id": "site-rota-morango-dourado",
+  "marca": "Rota do Caribe",
+  "nome": "Morango Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-morango-dourado-tampa.webp",
+  "tarja": "../img/site-rota-morango-dourado-tarja.webp",
+  "tarjaHd": "../img/site-rota-morango-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-morango-dourado.webp"
+ },
+ {
+  "id": "site-rota-morango-prata",
+  "marca": "Rota do Caribe",
+  "nome": "Morango Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-morango-prata-tampa.webp",
+  "tarja": "../img/site-rota-morango-prata-tarja.webp",
+  "tarjaHd": "../img/site-rota-morango-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-morango-prata.webp"
+ },
+ {
+  "id": "site-rota-caveira-dourado",
+  "marca": "Rota do Caribe",
+  "nome": "Caveira Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-caveira-dourado-tampa.webp",
+  "tarja": "../img/site-rota-caveira-dourado-tarja.webp",
+  "tarjaHd": "../img/site-rota-caveira-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-caveira-dourado.webp"
+ },
+ {
+  "id": "site-rota-caveira-prata",
+  "marca": "Rota do Caribe",
+  "nome": "Caveira Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-caveira-prata-tampa.webp",
+  "tarja": "../img/site-rota-caveira-prata-tarja.webp",
+  "tarjaHd": "../img/site-rota-caveira-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-caveira-prata.webp"
+ },
+ {
+  "id": "site-rota-teia-dourado",
+  "marca": "Rota do Caribe",
+  "nome": "Teia Dourado · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-teia-dourado-tampa.webp",
+  "tarja": "../img/site-rota-teia-dourado-tarja.webp",
+  "tarjaHd": "../img/site-rota-teia-dourado-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-teia-dourado.webp"
+ },
+ {
+  "id": "site-rota-teia-prata",
+  "marca": "Rota do Caribe",
+  "nome": "Teia Prata · Site publicado (Veleiros)",
+  "tampa": "../img/site-rota-teia-prata-tampa.webp",
+  "tarja": "../img/site-rota-teia-prata-tarja.webp",
+  "tarjaHd": "../img/site-rota-teia-prata-tarja.webp",
+  "thumb": "../img/thumbs/site-rota-teia-prata.webp"
+ },
+ {
+  "id": "verde-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tarja verde · 1º lote",
+  "tampa": "../img/verde-rota-tampa.webp",
+  "tarja": "../img/verde-rota-tarja.webp",
+  "tarjaHd": "../img/verde-rota-tarja.webp",
+  "thumb": "../img/thumbs/verde-rota.webp"
+ },
+ {
+  "id": "verde-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tarja verde · 1º lote",
+  "tampa": "../img/verde-veleiros-tampa.webp",
+  "tarja": "../img/verde-veleiros-tarja.webp",
+  "tarjaHd": "../img/verde-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/verde-veleiros.webp"
+ },
+ {
+  "id": "b-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo B · 2º lote",
+  "tampa": "../img/b-rota-tampa.webp",
+  "tarja": "../img/b-rota-tarja.webp",
+  "tarjaHd": "../img/b-rota-tarja.webp",
+  "thumb": "../img/thumbs/b-rota.webp"
+ },
+ {
+  "id": "b-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo B · 2º lote",
+  "tampa": "../img/b-veleiros-tampa.webp",
+  "tarja": "../img/b-veleiros-tarja.webp",
+  "tarjaHd": "../img/b-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/b-veleiros.webp"
+ },
+ {
+  "id": "c-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo C · 2º lote",
+  "tampa": "../img/c-rota-tampa.webp",
+  "tarja": "../img/c-rota-tarja.webp",
+  "tarjaHd": "../img/c-rota-tarja.webp",
+  "thumb": "../img/thumbs/c-rota.webp"
+ },
+ {
+  "id": "c-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo C · 2º lote",
+  "tampa": "../img/c-veleiros-tampa.webp",
+  "tarja": "../img/c-veleiros-tarja.webp",
+  "tarjaHd": "../img/c-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/c-veleiros.webp"
+ },
+ {
+  "id": "d-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo D · 2º lote",
+  "tampa": "../img/d-rota-tampa.webp",
+  "tarja": "../img/d-rota-tarja.webp",
+  "tarjaHd": "../img/d-rota-tarja.webp",
+  "thumb": "../img/thumbs/d-rota.webp"
+ },
+ {
+  "id": "d-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo D · 2º lote",
+  "tampa": "../img/d-veleiros-tampa.webp",
+  "tarja": "../img/d-veleiros-tarja.webp",
+  "tarjaHd": "../img/d-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/d-veleiros.webp"
+ },
+ {
+  "id": "e-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo E · 2º lote",
+  "tampa": "../img/e-rota-tampa.webp",
+  "tarja": "../img/e-rota-tarja.webp",
+  "tarjaHd": "../img/e-rota-tarja.webp",
+  "thumb": "../img/thumbs/e-rota.webp"
+ },
+ {
+  "id": "e-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo E · 2º lote",
+  "tampa": "../img/e-veleiros-tampa.webp",
+  "tarja": "../img/e-veleiros-tarja.webp",
+  "tarjaHd": "../img/e-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/e-veleiros.webp"
+ },
+ {
+  "id": "f-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo F · 2º lote",
+  "tampa": "../img/f-rota-tampa.webp",
+  "tarja": "../img/f-rota-tarja.webp",
+  "tarjaHd": "../img/f-rota-tarja.webp",
+  "thumb": "../img/thumbs/f-rota.webp"
+ },
+ {
+  "id": "f-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo F · 2º lote",
+  "tampa": "../img/f-veleiros-tampa.webp",
+  "tarja": "../img/f-veleiros-tarja.webp",
+  "tarjaHd": "../img/f-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/f-veleiros.webp"
+ },
+ {
+  "id": "g-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo G · 2º lote",
+  "tampa": "../img/g-rota-tampa.webp",
+  "tarja": "../img/g-rota-tarja.webp",
+  "tarjaHd": "../img/g-rota-tarja.webp",
+  "thumb": "../img/thumbs/g-rota.webp"
+ },
+ {
+  "id": "g-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo G · 2º lote",
+  "tampa": "../img/g-veleiros-tampa.webp",
+  "tarja": "../img/g-veleiros-tarja.webp",
+  "tarjaHd": "../img/g-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/g-veleiros.webp"
+ },
+ {
+  "id": "h-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo H · 2º lote",
+  "tampa": "../img/h-rota-tampa.webp",
+  "tarja": "../img/h-rota-tarja.webp",
+  "tarjaHd": "../img/h-rota-tarja.webp",
+  "thumb": "../img/thumbs/h-rota.webp"
+ },
+ {
+  "id": "h-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo H · 2º lote",
+  "tampa": "../img/h-veleiros-tampa.webp",
+  "tarja": "../img/h-veleiros-tarja.webp",
+  "tarjaHd": "../img/h-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/h-veleiros.webp"
+ },
+ {
+  "id": "i-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo I · 2º lote",
+  "tampa": "../img/i-rota-tampa.webp",
+  "tarja": "../img/i-rota-tarja.webp",
+  "tarjaHd": "../img/i-rota-tarja.webp",
+  "thumb": "../img/thumbs/i-rota.webp"
+ },
+ {
+  "id": "i-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo I · 2º lote",
+  "tampa": "../img/i-veleiros-tampa.webp",
+  "tarja": "../img/i-veleiros-tarja.webp",
+  "tarjaHd": "../img/i-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/i-veleiros.webp"
+ },
+ {
+  "id": "j-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo J · 3º lote",
+  "tampa": "../img/j-rota-tampa.webp",
+  "tarja": "../img/j-rota-tarja.webp",
+  "tarjaHd": "../img/j-rota-tarja.webp",
+  "thumb": "../img/thumbs/j-rota.webp"
+ },
+ {
+  "id": "j-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo J · 3º lote",
+  "tampa": "../img/j-veleiros-tampa.webp",
+  "tarja": "../img/j-veleiros-tarja.webp",
+  "tarjaHd": "../img/j-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/j-veleiros.webp"
+ },
+ {
+  "id": "k-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo K · 3º lote",
+  "tampa": "../img/k-rota-tampa.webp",
+  "tarja": "../img/k-rota-tarja.webp",
+  "tarjaHd": "../img/k-rota-tarja.webp",
+  "thumb": "../img/thumbs/k-rota.webp"
+ },
+ {
+  "id": "k-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo K · 3º lote",
+  "tampa": "../img/k-veleiros-tampa.webp",
+  "tarja": "../img/k-veleiros-tarja.webp",
+  "tarjaHd": "../img/k-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/k-veleiros.webp"
+ },
+ {
+  "id": "l-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo L · 3º lote",
+  "tampa": "../img/l-rota-tampa.webp",
+  "tarja": "../img/l-rota-tarja.webp",
+  "tarjaHd": "../img/l-rota-tarja.webp",
+  "thumb": "../img/thumbs/l-rota.webp"
+ },
+ {
+  "id": "l-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo L · 3º lote",
+  "tampa": "../img/l-veleiros-tampa.webp",
+  "tarja": "../img/l-veleiros-tarja.webp",
+  "tarjaHd": "../img/l-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/l-veleiros.webp"
+ },
+ {
+  "id": "n-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo N · 3º lote",
+  "tampa": "../img/n-rota-tampa.webp",
+  "tarja": "../img/n-rota-tarja.webp",
+  "tarjaHd": "../img/n-rota-tarja.webp",
+  "thumb": "../img/thumbs/n-rota.webp"
+ },
+ {
+  "id": "n-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo N · 3º lote",
+  "tampa": "../img/n-veleiros-tampa.webp",
+  "tarja": "../img/n-veleiros-tarja.webp",
+  "tarjaHd": "../img/n-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/n-veleiros.webp"
+ },
+ {
+  "id": "o-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo O · 3º lote",
+  "tampa": "../img/o-rota-tampa.webp",
+  "tarja": "../img/o-rota-tarja.webp",
+  "tarjaHd": "../img/o-rota-tarja.webp",
+  "thumb": "../img/thumbs/o-rota.webp"
+ },
+ {
+  "id": "o-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo O · 3º lote",
+  "tampa": "../img/o-veleiros-tampa.webp",
+  "tarja": "../img/o-veleiros-tarja.webp",
+  "tarjaHd": "../img/o-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/o-veleiros.webp"
+ },
+ {
+  "id": "p-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo P · 3º lote",
+  "tampa": "../img/p-rota-tampa.webp",
+  "tarja": "../img/p-rota-tarja.webp",
+  "tarjaHd": "../img/p-rota-tarja.webp",
+  "thumb": "../img/thumbs/p-rota.webp"
+ },
+ {
+  "id": "p-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo P · 3º lote",
+  "tampa": "../img/p-veleiros-tampa.webp",
+  "tarja": "../img/p-veleiros-tarja.webp",
+  "tarjaHd": "../img/p-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/p-veleiros.webp"
+ },
+ {
+  "id": "q-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo Q · 3º lote",
+  "tampa": "../img/q-rota-tampa.webp",
+  "tarja": "../img/q-rota-tarja.webp",
+  "tarjaHd": "../img/q-rota-tarja.webp",
+  "thumb": "../img/thumbs/q-rota.webp"
+ },
+ {
+  "id": "q-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo Q · 3º lote",
+  "tampa": "../img/q-veleiros-tampa.webp",
+  "tarja": "../img/q-veleiros-tarja.webp",
+  "tarjaHd": "../img/q-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/q-veleiros.webp"
+ },
+ {
+  "id": "s-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo S · 4º lote",
+  "tampa": "../img/s-rota-tampa.webp",
+  "tarja": "../img/s-rota-tarja.webp",
+  "tarjaHd": "../img/s-rota-tarja.webp",
+  "thumb": "../img/thumbs/s-rota.webp"
+ },
+ {
+  "id": "s-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo S · 4º lote",
+  "tampa": "../img/s-veleiros-tampa.webp",
+  "tarja": "../img/s-veleiros-tarja.webp",
+  "tarjaHd": "../img/s-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/s-veleiros.webp"
+ },
+ {
+  "id": "t-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo T · 4º lote",
+  "tampa": "../img/t-rota-tampa.webp",
+  "tarja": "../img/t-rota-tarja.webp",
+  "tarjaHd": "../img/t-rota-tarja.webp",
+  "thumb": "../img/thumbs/t-rota.webp"
+ },
+ {
+  "id": "t-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo T · 4º lote",
+  "tampa": "../img/t-veleiros-tampa.webp",
+  "tarja": "../img/t-veleiros-tarja.webp",
+  "tarjaHd": "../img/t-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/t-veleiros.webp"
+ },
+ {
+  "id": "u-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo U · 4º lote",
+  "tampa": "../img/u-rota-tampa.webp",
+  "tarja": "../img/u-rota-tarja.webp",
+  "tarjaHd": "../img/u-rota-tarja.webp",
+  "thumb": "../img/thumbs/u-rota.webp"
+ },
+ {
+  "id": "u-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo U · 4º lote",
+  "tampa": "../img/u-veleiros-tampa.webp",
+  "tarja": "../img/u-veleiros-tarja.webp",
+  "tarjaHd": "../img/u-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/u-veleiros.webp"
+ },
+ {
+  "id": "v-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo V · 4º lote",
+  "tampa": "../img/v-rota-tampa.webp",
+  "tarja": "../img/v-rota-tarja.webp",
+  "tarjaHd": "../img/v-rota-tarja.webp",
+  "thumb": "../img/thumbs/v-rota.webp"
+ },
+ {
+  "id": "v-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo V · 4º lote",
+  "tampa": "../img/v-veleiros-tampa.webp",
+  "tarja": "../img/v-veleiros-tarja.webp",
+  "tarjaHd": "../img/v-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/v-veleiros.webp"
+ },
+ {
+  "id": "w-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo W · 4º lote",
+  "tampa": "../img/w-rota-tampa.webp",
+  "tarja": "../img/w-rota-tarja.webp",
+  "tarjaHd": "../img/w-rota-tarja.webp",
+  "thumb": "../img/thumbs/w-rota.webp"
+ },
+ {
+  "id": "w-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo W · 4º lote",
+  "tampa": "../img/w-veleiros-tampa.webp",
+  "tarja": "../img/w-veleiros-tarja.webp",
+  "tarjaHd": "../img/w-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/w-veleiros.webp"
+ },
+ {
+  "id": "x-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo X · 4º lote",
+  "tampa": "../img/x-rota-tampa.webp",
+  "tarja": "../img/x-rota-tarja.webp",
+  "tarjaHd": "../img/x-rota-tarja.webp",
+  "thumb": "../img/thumbs/x-rota.webp"
+ },
+ {
+  "id": "x-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo X · 4º lote",
+  "tampa": "../img/x-veleiros-tampa.webp",
+  "tarja": "../img/x-veleiros-tarja.webp",
+  "tarjaHd": "../img/x-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/x-veleiros.webp"
+ },
+ {
+  "id": "y-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo Y · 4º lote",
+  "tampa": "../img/y-rota-tampa.webp",
+  "tarja": "../img/y-rota-tarja.webp",
+  "tarjaHd": "../img/y-rota-tarja.webp",
+  "thumb": "../img/thumbs/y-rota.webp"
+ },
+ {
+  "id": "y-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo Y · 4º lote",
+  "tampa": "../img/y-veleiros-tampa.webp",
+  "tarja": "../img/y-veleiros-tarja.webp",
+  "tarjaHd": "../img/y-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/y-veleiros.webp"
+ },
+ {
+  "id": "z-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo Z · 4º lote",
+  "tampa": "../img/z-rota-tampa.webp",
+  "tarja": "../img/z-rota-tarja.webp",
+  "tarjaHd": "../img/z-rota-tarja.webp",
+  "thumb": "../img/thumbs/z-rota.webp"
+ },
+ {
+  "id": "z-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo Z · 4º lote",
+  "tampa": "../img/z-veleiros-tampa.webp",
+  "tarja": "../img/z-veleiros-tarja.webp",
+  "tarjaHd": "../img/z-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/z-veleiros.webp"
+ },
+ {
+  "id": "aa-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AA · 4º lote",
+  "tampa": "../img/aa-rota-tampa.webp",
+  "tarja": "../img/aa-rota-tarja.webp",
+  "tarjaHd": "../img/aa-rota-tarja.webp",
+  "thumb": "../img/thumbs/aa-rota.webp"
+ },
+ {
+  "id": "aa-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AA · 4º lote",
+  "tampa": "../img/aa-veleiros-tampa.webp",
+  "tarja": "../img/aa-veleiros-tarja.webp",
+  "tarjaHd": "../img/aa-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/aa-veleiros.webp"
+ },
+ {
+  "id": "ab-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AB · 4º lote",
+  "tampa": "../img/ab-rota-tampa.webp",
+  "tarja": "../img/ab-rota-tarja.webp",
+  "tarjaHd": "../img/ab-rota-tarja.webp",
+  "thumb": "../img/thumbs/ab-rota.webp"
+ },
+ {
+  "id": "ab-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AB · 4º lote",
+  "tampa": "../img/ab-veleiros-tampa.webp",
+  "tarja": "../img/ab-veleiros-tarja.webp",
+  "tarjaHd": "../img/ab-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/ab-veleiros.webp"
+ },
+ {
+  "id": "ac-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AC · 4º lote",
+  "tampa": "../img/ac-rota-tampa.webp",
+  "tarja": "../img/ac-rota-tarja.webp",
+  "tarjaHd": "../img/ac-rota-tarja.webp",
+  "thumb": "../img/thumbs/ac-rota.webp"
+ },
+ {
+  "id": "ac-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AC · 4º lote",
+  "tampa": "../img/ac-veleiros-tampa.webp",
+  "tarja": "../img/ac-veleiros-tarja.webp",
+  "tarjaHd": "../img/ac-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/ac-veleiros.webp"
+ },
+ {
+  "id": "ad-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AD · 4º lote",
+  "tampa": "../img/ad-rota-tampa.webp",
+  "tarja": "../img/ad-rota-tarja.webp",
+  "tarjaHd": "../img/ad-rota-tarja.webp",
+  "thumb": "../img/thumbs/ad-rota.webp"
+ },
+ {
+  "id": "ad-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AD · 4º lote",
+  "tampa": "../img/ad-veleiros-tampa.webp",
+  "tarja": "../img/ad-veleiros-tarja.webp",
+  "tarjaHd": "../img/ad-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/ad-veleiros.webp"
+ },
+ {
+  "id": "ae-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AE · 4º lote",
+  "tampa": "../img/ae-rota-tampa.webp",
+  "tarja": "../img/ae-rota-tarja.webp",
+  "tarjaHd": "../img/ae-rota-tarja.webp",
+  "thumb": "../img/thumbs/ae-rota.webp"
+ },
+ {
+  "id": "ae-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AE · 4º lote",
+  "tampa": "../img/ae-veleiros-tampa.webp",
+  "tarja": "../img/ae-veleiros-tarja.webp",
+  "tarjaHd": "../img/ae-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/ae-veleiros.webp"
+ },
+ {
+  "id": "af-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AF · 4º lote",
+  "tampa": "../img/af-rota-tampa.webp",
+  "tarja": "../img/af-rota-tarja.webp",
+  "tarjaHd": "../img/af-rota-tarja.webp",
+  "thumb": "../img/thumbs/af-rota.webp"
+ },
+ {
+  "id": "af-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AF · 4º lote",
+  "tampa": "../img/af-veleiros-tampa.webp",
+  "tarja": "../img/af-veleiros-tarja.webp",
+  "tarjaHd": "../img/af-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/af-veleiros.webp"
+ },
+ {
+  "id": "ag-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AG · 4º lote",
+  "tampa": "../img/ag-rota-tampa.webp",
+  "tarja": "../img/ag-rota-tarja.webp",
+  "tarjaHd": "../img/ag-rota-tarja.webp",
+  "thumb": "../img/thumbs/ag-rota.webp"
+ },
+ {
+  "id": "ag-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AG · 4º lote",
+  "tampa": "../img/ag-veleiros-tampa.webp",
+  "tarja": "../img/ag-veleiros-tarja.webp",
+  "tarjaHd": "../img/ag-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/ag-veleiros.webp"
+ },
+ {
+  "id": "ah-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AH · 4º lote",
+  "tampa": "../img/ah-rota-tampa.webp",
+  "tarja": "../img/ah-rota-tarja.webp",
+  "tarjaHd": "../img/ah-rota-tarja.webp",
+  "thumb": "../img/thumbs/ah-rota.webp"
+ },
+ {
+  "id": "ah-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AH · 4º lote",
+  "tampa": "../img/ah-veleiros-tampa.webp",
+  "tarja": "../img/ah-veleiros-tarja.webp",
+  "tarjaHd": "../img/ah-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/ah-veleiros.webp"
+ },
+ {
+  "id": "ai-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AI · 4º lote",
+  "tampa": "../img/ai-rota-tampa.webp",
+  "tarja": "../img/ai-rota-tarja.webp",
+  "tarjaHd": "../img/ai-rota-tarja.webp",
+  "thumb": "../img/thumbs/ai-rota.webp"
+ },
+ {
+  "id": "ai-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AI · 4º lote",
+  "tampa": "../img/ai-veleiros-tampa.webp",
+  "tarja": "../img/ai-veleiros-tarja.webp",
+  "tarjaHd": "../img/ai-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/ai-veleiros.webp"
+ },
+ {
+  "id": "aj-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AJ · 4º lote",
+  "tampa": "../img/aj-rota-tampa.webp",
+  "tarja": "../img/aj-rota-tarja.webp",
+  "tarjaHd": "../img/aj-rota-tarja.webp",
+  "thumb": "../img/thumbs/aj-rota.webp"
+ },
+ {
+  "id": "aj-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AJ · 4º lote",
+  "tampa": "../img/aj-veleiros-tampa.webp",
+  "tarja": "../img/aj-veleiros-tarja.webp",
+  "tarjaHd": "../img/aj-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/aj-veleiros.webp"
+ },
+ {
+  "id": "ak-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AK · 4º lote",
+  "tampa": "../img/ak-rota-tampa.webp",
+  "tarja": "../img/ak-rota-tarja.webp",
+  "tarjaHd": "../img/ak-rota-tarja.webp",
+  "thumb": "../img/thumbs/ak-rota.webp"
+ },
+ {
+  "id": "ak-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AK · 4º lote",
+  "tampa": "../img/ak-veleiros-tampa.webp",
+  "tarja": "../img/ak-veleiros-tarja.webp",
+  "tarjaHd": "../img/ak-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/ak-veleiros.webp"
+ },
+ {
+  "id": "al-rota",
+  "marca": "Rota do Caribe",
+  "nome": "Tipo AL · 4º lote",
+  "tampa": "../img/al-rota-tampa.webp",
+  "tarja": "../img/al-rota-tarja.webp",
+  "tarjaHd": "../img/al-rota-tarja.webp",
+  "thumb": "../img/thumbs/al-rota.webp"
+ },
+ {
+  "id": "al-veleiros",
+  "marca": "Veleiros do Caribe",
+  "nome": "Tipo AL · 4º lote",
+  "tampa": "../img/al-veleiros-tampa.webp",
+  "tarja": "../img/al-veleiros-tarja.webp",
+  "tarjaHd": "../img/al-veleiros-tarja.webp",
+  "thumb": "../img/thumbs/al-veleiros.webp"
+ },
+ {
+  "id": "ref-pistache-bronze-pistache",
+  "marca": "Rota do Caribe",
+  "nome": "Pistache bronze · Gerador por referência",
+  "tampa": "../img/ref-pistache-bronze-pistache-tampa.webp",
+  "tarja": "../img/ref-pistache-bronze-pistache-tarja.webp",
+  "tarjaHd": "../img/ref-pistache-bronze-pistache-tarja.webp",
+  "thumb": "../img/thumbs/ref-pistache-bronze-pistache.webp"
+ },
+ {
+  "id": "ref-pistache-esmalte-pistache",
+  "marca": "Rota do Caribe",
+  "nome": "Pistache esmalte · Gerador por referência",
+  "tampa": "../img/ref-pistache-esmalte-pistache-tampa.webp",
+  "tarja": "../img/ref-pistache-esmalte-pistache-tarja.webp",
+  "tarjaHd": "../img/ref-pistache-esmalte-pistache-tarja.webp",
+  "thumb": "../img/thumbs/ref-pistache-esmalte-pistache.webp"
+ },
+ {
+  "id": "ref-pistache-galeoes-pistache",
+  "marca": "Rota do Caribe",
+  "nome": "Pistache galeoes · Gerador por referência",
+  "tampa": "../img/ref-pistache-galeoes-pistache-tampa.webp",
+  "tarja": "../img/ref-pistache-galeoes-pistache-tarja.webp",
+  "tarjaHd": "../img/ref-pistache-galeoes-pistache-tarja.webp",
+  "thumb": "../img/thumbs/ref-pistache-galeoes-pistache.webp"
+ }
+]

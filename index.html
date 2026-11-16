@@ -30,6 +30,7 @@
   .corpo { padding:16px; overflow:auto; max-height:94vh; }
   .topo { display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
   .topo h2 { margin:0; font-size:18px; flex:1 1 auto; }
+  .topo a { font:inherit; padding:7px 12px; border:1px solid var(--destaque); border-radius:8px; background:var(--destaque); color:#fff; text-decoration:none; }
   .topo button { font:inherit; padding:7px 12px; border:1px solid var(--linha); border-radius:8px; background:var(--cartao); color:var(--texto); cursor:pointer; }
   .grandes img { display:block; max-width:100%; height:auto; margin:0 auto 14px; }
   .grandes .tampa { max-height:62vh; width:auto; }
@@ -52,7 +53,7 @@
 <main id="grade"></main>
 <p id="vazio" hidden>Nenhum kit com esse filtro.</p>
 <dialog id="modal"><div class="corpo">
-  <div class="topo"><h2 id="mTitulo"></h2><button id="mAnt">‹ Anterior</button><button id="mProx">Próximo ›</button><button id="mFechar">Fechar</button></div>
+  <div class="topo"><h2 id="mTitulo"></h2><a id="m3d" href="3d.html" target="_blank" rel="noopener">Ver em 3D</a><button id="mAnt">‹ Anterior</button><button id="mProx">Próximo ›</button><button id="mFechar">Fechar</button></div>
   <div class="grandes"><img id="mTampa" class="tampa" alt=""><p class="legenda">Tarja (190 × 17 mm)</p><img id="mTarja" alt=""></div>
 </div></dialog>
 <script src="kits.js"></script>
@@ -64,6 +65,7 @@ let visiveis = [], atual = -1;
 const norm = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const lotes = [...new Set(KITS.map((k) => k.lote))];
 $('#lote').append(...lotes.map((l) => Object.assign(document.createElement('option'), { value: l, textContent: l })));
+const slug = (m) => norm(m).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 function curto(m) { return m.replace(' do Caribe', ''); }
 function desenhar() {
   visiveis = KITS.filter((k) => (!est.marca || k.marca === est.marca) && (!est.lote || k.lote === est.lote) && (!est.busca || norm(`${k.nome} ${k.marca} ${k.lote}`).includes(est.busca)));
@@ -82,6 +84,7 @@ function abrir(i) {
   atual = (i + visiveis.length) % visiveis.length; const k = visiveis[atual];
   $('#mTitulo').textContent = `${k.nome} · ${curto(k.marca)} · ${k.lote}`;
   $('#mTampa').src = `img/${k.id}-tampa.webp`; $('#mTarja').src = `img/${k.id}-tarja.webp`;
+  $('#m3d').href = `3d.html?marca=${slug(k.marca)}&kit=${encodeURIComponent(k.id)}`;
   if (!$('#modal').open) $('#modal').showModal();
 }
 document.querySelectorAll('[data-marca]').forEach((b) => b.onclick = () => { est.marca = b.dataset.marca; document.querySelectorAll('[data-marca]').forEach((x) => x.classList.toggle('on', x === b)); desenhar(); });
