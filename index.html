@@ -5,95 +5,263 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rótulos Rota e Veleiros do Caribe</title>
 <style>
-  :root { --fundo:#f3f1ec; --cartao:#fff; --texto:#1c1f22; --suave:#6b7075; --linha:#dcd8cf; --destaque:#1f5f5b; }
+  :root { --fundo:#f3f1ec; --cartao:#fff; --texto:#1c1f22; --suave:#6b7075; --linha:#dcd8cf; --destaque:#1f5f5b; --alterar:#c4570f; --ok:#2f7d3a; }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--fundo); color:var(--texto); font:15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; padding:0 16px 40px; }
   header { max-width:1400px; margin:0 auto; padding:22px 0 12px; }
   h1 { margin:0 0 4px; font-size:22px; }
   header p { margin:0; color:var(--suave); }
   .barra { max-width:1400px; margin:0 auto 16px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; position:sticky; top:0; background:var(--fundo); padding:10px 0; z-index:5; }
-  .barra button, .barra select, .barra input { font:inherit; padding:8px 12px; border:1px solid var(--linha); border-radius:8px; background:var(--cartao); color:var(--texto); }
+  button, select, input, textarea { font:inherit; }
+  .barra button, .barra select, .barra input { padding:8px 12px; border:1px solid var(--linha); border-radius:8px; background:var(--cartao); color:var(--texto); }
   .barra button { cursor:pointer; }
   .barra button.on { background:var(--destaque); border-color:var(--destaque); color:#fff; }
   .barra input { flex:1 1 180px; min-width:0; }
   #contagem { color:var(--suave); margin-left:auto; }
   #grade { max-width:1400px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
-  .kit { background:var(--cartao); border:1px solid var(--linha); border-radius:12px; padding:12px; cursor:pointer; text-align:left; font:inherit; color:inherit; }
+  .kit { position:relative; background:var(--cartao); border:1px solid var(--linha); border-radius:12px; padding:12px; cursor:pointer; text-align:left; color:inherit; }
   .kit:hover { border-color:var(--destaque); }
+  .kit.alterar { border-color:var(--alterar); box-shadow:0 0 0 1px var(--alterar) inset; }
+  .kit.aprovado { border-color:var(--ok); }
   .kit img { display:block; width:100%; height:auto; }
   .kit .tampa { max-width:200px; margin:0 auto 10px; aspect-ratio:1; object-fit:contain; }
   .kit .nome { font-weight:600; margin-top:8px; }
   .kit .info { color:var(--suave); font-size:13px; }
+  .selo { position:absolute; top:8px; right:8px; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:600; color:#fff; }
+  .selo.alterar { background:var(--alterar); } .selo.aprovado { background:var(--ok); }
   #vazio { max-width:1400px; margin:30px auto; color:var(--suave); }
   dialog { border:0; border-radius:14px; padding:0; width:min(1200px, 96vw); max-height:94vh; background:var(--cartao); color:var(--texto); }
   dialog::backdrop { background:rgba(0,0,0,.6); }
   .corpo { padding:16px; overflow:auto; max-height:94vh; }
   .topo { display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
   .topo h2 { margin:0; font-size:18px; flex:1 1 auto; }
-  .topo a { font:inherit; padding:7px 12px; border:1px solid var(--destaque); border-radius:8px; background:var(--destaque); color:#fff; text-decoration:none; }
-  .topo button { font:inherit; padding:7px 12px; border:1px solid var(--linha); border-radius:8px; background:var(--cartao); color:var(--texto); cursor:pointer; }
-  .grandes img { display:block; max-width:100%; height:auto; margin:0 auto 14px; }
-  .grandes .tampa { max-height:62vh; width:auto; }
+  .topo a { padding:7px 12px; border:1px solid var(--destaque); border-radius:8px; background:var(--destaque); color:#fff; text-decoration:none; }
+  .topo button, .acoes button { padding:7px 12px; border:1px solid var(--linha); border-radius:8px; background:var(--cartao); color:var(--texto); cursor:pointer; }
+  .alvo { position:relative; width:fit-content; max-width:100%; margin:0 auto 14px; line-height:0; }
+  .alvo img { display:block; max-width:100%; height:auto; }
+  .alvo.tampa img { max-height:62vh; width:auto; }
+  .alvo.marcando { outline:2px dashed var(--alterar); cursor:crosshair; }
+  .pin { position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; background:var(--alterar); color:#fff; font:700 12px/22px system-ui; text-align:center; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.5); pointer-events:none; }
   .legenda { color:var(--suave); font-size:13px; text-align:center; margin:-8px 0 10px; }
+  .notas { border-top:1px solid var(--linha); padding-top:12px; display:grid; gap:10px; }
+  .estado { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .estado button { padding:7px 14px; border:1px solid var(--linha); border-radius:8px; background:var(--cartao); color:var(--texto); cursor:pointer; }
+  .estado button.on.alterar { background:var(--alterar); border-color:var(--alterar); color:#fff; }
+  .estado button.on.aprovado { background:var(--ok); border-color:var(--ok); color:#fff; }
+  .estado button.marcar.on { background:var(--alterar); border-color:var(--alterar); color:#fff; }
+  .pinlinha { display:flex; gap:8px; align-items:center; margin:4px 0; }
+  .pinlinha b { flex:0 0 auto; width:22px; height:22px; border-radius:50%; background:var(--alterar); color:#fff; text-align:center; font-size:12px; line-height:22px; }
+  .pinlinha small { flex:0 0 auto; color:var(--suave); }
+  .pinlinha input { flex:1 1 auto; min-width:0; padding:6px 8px; border:1px solid var(--linha); border-radius:6px; }
+  .pinlinha button { border:0; background:none; cursor:pointer; color:var(--suave); font-size:18px; }
+  textarea { width:100%; min-height:70px; padding:8px; border:1px solid var(--linha); border-radius:8px; resize:vertical; }
+  .acoes { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 14px; }
+  .res-kit { border:1px solid var(--linha); border-radius:10px; padding:10px; margin-bottom:12px; break-inside:avoid; }
+  .res-kit h3 { margin:0 0 6px; font-size:15px; }
+  .res-kit .alvo { margin:6px 0; } .res-kit .alvo.tampa img { max-height:200px; } .res-kit .alvo.tarja img { max-width:100%; }
+  .res-kit p { margin:4px 0; font-size:13px; white-space:pre-wrap; }
+  @media print { body { padding:0; background:#fff; } body > *:not(#resumo) { display:none !important; } #resumo { position:static; width:auto; max-height:none; box-shadow:none; } #resumo .corpo { max-height:none; overflow:visible; } #resumo .acoes, #resumo .topo button { display:none; } }
 </style>
 </head>
 <body>
 <header>
   <h1>Rótulos Rota do Caribe e Veleiros do Caribe</h1>
-  <p>Todos os kits produzidos: tampa e tarja. Clique em um kit para ampliar.</p>
+  <p>Todos os kits produzidos: tampa e tarja. Clique em um kit para ampliar, marcar alterações e anotar.</p>
 </header>
 <div class="barra">
   <button data-marca="" class="on">Todas</button>
   <button data-marca="Rota do Caribe">Rota</button>
   <button data-marca="Veleiros do Caribe">Veleiros</button>
   <select id="lote"><option value="">Todos os lotes</option></select>
+  <select id="estado"><option value="">Todos os estados</option><option value="alterar">Para alterar</option><option value="aprovado">Aprovados</option><option value="sem">Sem avaliação</option></select>
   <input id="busca" type="search" placeholder="Buscar (ex.: Tipo AB, Pistache)">
+  <button id="abrirResumo">Resumo das alterações</button>
   <span id="contagem"></span>
 </div>
 <main id="grade"></main>
 <p id="vazio" hidden>Nenhum kit com esse filtro.</p>
+
 <dialog id="modal"><div class="corpo">
   <div class="topo"><h2 id="mTitulo"></h2><a id="m3d" href="3d.html" target="_blank" rel="noopener">Ver em 3D</a><button id="mAnt">‹ Anterior</button><button id="mProx">Próximo ›</button><button id="mFechar">Fechar</button></div>
-  <div class="grandes"><img id="mTampa" class="tampa" alt=""><p class="legenda">Tarja (190 × 17 mm)</p><img id="mTarja" alt=""></div>
+  <div class="grandes">
+    <div class="alvo tampa" id="aTampa"><img id="mTampa" alt=""></div>
+    <p class="legenda">Tarja (190 × 17 mm)</p>
+    <div class="alvo tarja" id="aTarja"><img id="mTarja" alt=""></div>
+  </div>
+  <section class="notas">
+    <div class="estado" id="estados">
+      <button data-st="" class="on">Sem avaliação</button>
+      <button data-st="aprovado">Aprovado</button>
+      <button data-st="alterar">Alterar</button>
+      <button class="marcar" id="bMarcar">Marcar na imagem</button>
+    </div>
+    <div id="listaPins"></div>
+    <textarea id="notaGeral" placeholder="Anotação geral deste kit (o que o cliente quer mudar)"></textarea>
+  </section>
 </div></dialog>
+
+<dialog id="resumo"><div class="corpo">
+  <div class="topo"><h2>Resumo das alterações</h2><button id="rFechar">Fechar</button></div>
+  <div class="acoes">
+    <button id="rCopiar">Copiar texto</button>
+    <button id="rImprimir">Imprimir / salvar em PDF</button>
+    <button id="rBaixar">Baixar backup (.json)</button>
+    <button id="rCarregar">Carregar backup</button>
+    <input type="file" id="rArquivo" accept="application/json" hidden>
+    <button id="rLimpar">Apagar todas as anotações</button>
+  </div>
+  <p id="rVazio" hidden>Nenhum kit com anotação ainda.</p>
+  <div id="rLista"></div>
+</div></dialog>
+
 <script src="kits.js"></script>
 <script>
 const KITS = window.KITS || [];
 const $ = (s) => document.querySelector(s);
-const est = { marca: '', lote: '', busca: '' };
-let visiveis = [], atual = -1;
+const est = { marca: '', lote: '', busca: '', estado: '' };
+let visiveis = [], atual = -1, marcando = false;
 const norm = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const slug = (m) => norm(m).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const curto = (m) => m.replace(' do Caribe', '');
+const porId = Object.fromEntries(KITS.map((k) => [k.id, k]));
+
+/* ---------- anotações: ficam no navegador deste computador (localStorage) ---------- */
+const CHAVE = 'rv-notas-v1';
+let notas = {};
+try { notas = JSON.parse(localStorage.getItem(CHAVE) || '{}'); } catch (e) { notas = {}; }
+function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify(notas)); } catch (e) { /* navegador bloqueou: use o backup */ } }
+const nota = (id) => notas[id] || (notas[id] = { status: '', nota: '', pins: [] });
+const temNota = (id) => { const n = notas[id]; return !!n && (n.status || n.nota || n.pins.length); };
+function limpa(id) { const n = notas[id]; if (n && !n.status && !n.nota && !n.pins.length) delete notas[id]; }
+const estadoDe = (id) => (notas[id] && notas[id].status) || 'sem';
+const nAlterar = () => Object.keys(notas).filter((id) => porId[id] && temNota(id)).length;
+
+/* ---------- grade ---------- */
 const lotes = [...new Set(KITS.map((k) => k.lote))];
 $('#lote').append(...lotes.map((l) => Object.assign(document.createElement('option'), { value: l, textContent: l })));
-const slug = (m) => norm(m).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-function curto(m) { return m.replace(' do Caribe', ''); }
 function desenhar() {
-  visiveis = KITS.filter((k) => (!est.marca || k.marca === est.marca) && (!est.lote || k.lote === est.lote) && (!est.busca || norm(`${k.nome} ${k.marca} ${k.lote}`).includes(est.busca)));
+  visiveis = KITS.filter((k) => (!est.marca || k.marca === est.marca) && (!est.lote || k.lote === est.lote) && (!est.estado || estadoDe(k.id) === est.estado) && (!est.busca || norm(`${k.nome} ${k.marca} ${k.lote}`).includes(est.busca)));
   const g = $('#grade'); g.textContent = '';
   visiveis.forEach((k, i) => {
     const b = document.createElement('button'); b.className = 'kit'; b.type = 'button';
+    const st = estadoDe(k.id); if (st !== 'sem') b.classList.add(st);
     b.innerHTML = `<img class="tampa" loading="lazy" alt=""><img class="tarja" loading="lazy" alt=""><div class="nome"></div><div class="info"></div>`;
     b.querySelector('.tampa').src = `img/${k.id}-tampa.webp`; b.querySelector('.tarja').src = `img/${k.id}-tarja.webp`;
     b.querySelector('.nome').textContent = k.nome; b.querySelector('.info').textContent = `${curto(k.marca)} · ${k.lote}`;
+    const n = notas[k.id];
+    if (n && (n.status || n.pins.length || n.nota)) {
+      const s = document.createElement('span'); s.className = 'selo ' + (n.status || 'alterar');
+      s.textContent = (n.status === 'aprovado' ? 'Aprovado' : 'Alterar') + (n.pins.length ? ` · ${n.pins.length} marca${n.pins.length > 1 ? 's' : ''}` : '');
+      b.append(s);
+    }
     b.onclick = () => abrir(i); g.append(b);
   });
   $('#contagem').textContent = `${visiveis.length} de ${KITS.length} kits`;
+  $('#abrirResumo').textContent = `Resumo das alterações (${nAlterar()})`;
   $('#vazio').hidden = visiveis.length > 0;
+}
+
+/* ---------- pinos sobre uma imagem ---------- */
+function desenharPins(alvo, kitId, peca, so) {
+  alvo.querySelectorAll('.pin').forEach((p) => p.remove());
+  (notas[kitId] ? notas[kitId].pins : []).forEach((p, i) => {
+    if (p.p !== peca) return;
+    const d = document.createElement('span'); d.className = 'pin'; d.textContent = i + 1;
+    d.style.left = p.x + '%'; d.style.top = p.y + '%'; alvo.append(d);
+  });
+}
+
+/* ---------- ampliar e anotar ---------- */
+function atualizarModal() {
+  const k = visiveis[atual]; if (!k) return;
+  const n = notas[k.id] || { status: '', nota: '', pins: [] };
+  document.querySelectorAll('#estados [data-st]').forEach((b) => b.classList.toggle('on', b.dataset.st === (n.status || '')));
+  document.querySelectorAll('#estados [data-st]').forEach((b) => { b.classList.remove('alterar', 'aprovado'); if (b.dataset.st) b.classList.add(b.dataset.st); });
+  $('#notaGeral').value = n.nota;
+  desenharPins($('#aTampa'), k.id, 'tampa'); desenharPins($('#aTarja'), k.id, 'tarja');
+  const lp = $('#listaPins'); lp.textContent = '';
+  n.pins.forEach((p, i) => {
+    const l = document.createElement('div'); l.className = 'pinlinha';
+    l.innerHTML = '<b></b><small></small><input type="text" placeholder="O que mudar aqui?"><button type="button" title="Apagar esta marca">×</button>';
+    l.querySelector('b').textContent = i + 1; l.querySelector('small').textContent = p.p === 'tampa' ? 'Tampa' : 'Tarja';
+    const inp = l.querySelector('input'); inp.value = p.t;
+    inp.oninput = () => { p.t = inp.value; salvar(); };
+    l.querySelector('button').onclick = () => { n.pins.splice(i, 1); limpa(k.id); salvar(); atualizarModal(); desenhar(); };
+    lp.append(l);
+  });
 }
 function abrir(i) {
   atual = (i + visiveis.length) % visiveis.length; const k = visiveis[atual];
   $('#mTitulo').textContent = `${k.nome} · ${curto(k.marca)} · ${k.lote}`;
   $('#mTampa').src = `img/${k.id}-tampa.webp`; $('#mTarja').src = `img/${k.id}-tarja.webp`;
   $('#m3d').href = `3d.html?marca=${slug(k.marca)}&kit=${encodeURIComponent(k.id)}`;
+  setMarcar(false); atualizarModal();
   if (!$('#modal').open) $('#modal').showModal();
 }
+function setMarcar(v) { marcando = v; $('#bMarcar').classList.toggle('on', v); $('#aTampa').classList.toggle('marcando', v); $('#aTarja').classList.toggle('marcando', v); }
+$('#bMarcar').onclick = () => setMarcar(!marcando);
+function clicarImagem(alvo, peca) {
+  alvo.addEventListener('click', (e) => {
+    if (!marcando) return;
+    const k = visiveis[atual], r = alvo.querySelector('img').getBoundingClientRect(), n = nota(k.id);
+    n.pins.push({ p: peca, x: +(((e.clientX - r.left) / r.width) * 100).toFixed(1), y: +(((e.clientY - r.top) / r.height) * 100).toFixed(1), t: '' });
+    if (!n.status) n.status = 'alterar';
+    salvar(); atualizarModal(); desenhar();
+    const campos = $('#listaPins').querySelectorAll('input'); if (campos.length) campos[campos.length - 1].focus();
+  });
+}
+clicarImagem($('#aTampa'), 'tampa'); clicarImagem($('#aTarja'), 'tarja');
+document.querySelectorAll('#estados [data-st]').forEach((b) => b.onclick = () => { const k = visiveis[atual], n = nota(k.id); n.status = b.dataset.st; limpa(k.id); salvar(); atualizarModal(); desenhar(); });
+$('#notaGeral').oninput = (e) => { const k = visiveis[atual], n = nota(k.id); n.nota = e.target.value; limpa(k.id); salvar(); desenhar(); };
+
+/* ---------- filtros e navegação ---------- */
 document.querySelectorAll('[data-marca]').forEach((b) => b.onclick = () => { est.marca = b.dataset.marca; document.querySelectorAll('[data-marca]').forEach((x) => x.classList.toggle('on', x === b)); desenhar(); });
 $('#lote').onchange = (e) => { est.lote = e.target.value; desenhar(); };
+$('#estado').onchange = (e) => { est.estado = e.target.value; desenhar(); };
 $('#busca').oninput = (e) => { est.busca = norm(e.target.value.trim()); desenhar(); };
 $('#mFechar').onclick = () => $('#modal').close();
 $('#mAnt').onclick = () => abrir(atual - 1); $('#mProx').onclick = () => abrir(atual + 1);
 $('#modal').addEventListener('click', (e) => { if (e.target === $('#modal')) $('#modal').close(); });
-document.addEventListener('keydown', (e) => { if (!$('#modal').open) return; if (e.key === 'ArrowLeft') abrir(atual - 1); if (e.key === 'ArrowRight') abrir(atual + 1); });
+$('#modal').addEventListener('close', desenhar);
+document.addEventListener('keydown', (e) => { if (!$('#modal').open || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return; if (e.key === 'ArrowLeft') abrir(atual - 1); if (e.key === 'ArrowRight') abrir(atual + 1); });
+
+/* ---------- resumo, impressão e backup ---------- */
+function textoResumo() {
+  const linhas = [];
+  Object.keys(notas).filter((id) => porId[id] && temNota(id)).forEach((id) => {
+    const k = porId[id], n = notas[id];
+    linhas.push(`• ${k.nome} · ${curto(k.marca)} · ${k.lote} — ${n.status === 'aprovado' ? 'APROVADO' : 'ALTERAR'}`);
+    if (n.nota) linhas.push(`   Geral: ${n.nota}`);
+    n.pins.forEach((p, i) => linhas.push(`   ${i + 1} (${p.p}): ${p.t || '(sem texto)'}`));
+  });
+  return linhas.join('\n');
+}
+function abrirResumo() {
+  const ids = Object.keys(notas).filter((id) => porId[id] && temNota(id)), lista = $('#rLista'); lista.textContent = '';
+  $('#rVazio').hidden = ids.length > 0;
+  ids.forEach((id) => {
+    const k = porId[id], n = notas[id], c = document.createElement('div'); c.className = 'res-kit';
+    const h = document.createElement('h3'); h.textContent = `${k.nome} · ${curto(k.marca)} · ${k.lote} — ${n.status === 'aprovado' ? 'Aprovado' : 'Alterar'}`; c.append(h);
+    [['tampa', 'tampa'], ['tarja', 'tarja']].forEach(([peca]) => {
+      if (!n.pins.some((p) => p.p === peca)) return;
+      const a = document.createElement('div'); a.className = 'alvo ' + peca; const im = document.createElement('img'); im.src = `img/${k.id}-${peca}.webp`; a.append(im); c.append(a);
+      desenharPins(a, id, peca);
+    });
+    if (n.nota) { const p = document.createElement('p'); p.textContent = 'Geral: ' + n.nota; c.append(p); }
+    n.pins.forEach((p, i) => { const q = document.createElement('p'); q.textContent = `${i + 1} (${p.p}): ${p.t || '(sem texto)'}`; c.append(q); });
+    lista.append(c);
+  });
+  $('#resumo').showModal();
+}
+$('#abrirResumo').onclick = abrirResumo;
+$('#rFechar').onclick = () => $('#resumo').close();
+$('#rImprimir').onclick = () => window.print();
+$('#rCopiar').onclick = async () => { const t = textoResumo() || 'Nenhuma anotação.'; try { await navigator.clipboard.writeText(t); $('#rCopiar').textContent = 'Copiado!'; } catch (e) { $('#rCopiar').textContent = 'Não foi possível copiar'; } setTimeout(() => ($('#rCopiar').textContent = 'Copiar texto'), 1800); };
+$('#rBaixar').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(notas)], { type: 'application/json' })); a.download = 'anotacoes-rotulos.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); };
+$('#rCarregar').onclick = () => $('#rArquivo').click();
+$('#rArquivo').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { const d = JSON.parse(await f.text()); if (d && typeof d === 'object') { notas = d; salvar(); desenhar(); abrirResumo(); } } catch (err) { alert('Arquivo de backup inválido.'); } e.target.value = ''; };
+let confirmaLimpar = false;
+$('#rLimpar').onclick = () => { if (!confirmaLimpar) { confirmaLimpar = true; $('#rLimpar').textContent = 'Clique de novo para confirmar'; setTimeout(() => { confirmaLimpar = false; $('#rLimpar').textContent = 'Apagar todas as anotações'; }, 4000); return; } notas = {}; salvar(); desenhar(); abrirResumo(); confirmaLimpar = false; $('#rLimpar').textContent = 'Apagar todas as anotações'; };
 desenhar();
 </script>
 </body>
